@@ -1,0 +1,29 @@
+{
+  "name": "amulet-cli",
+  "version": "0.1.0",
+  "description": "CLI for the Amulet registry — push and pull AI workflow assets",
+  "keywords": [
+    "ai",
+    "cli",
+    "prompts",
+    "skills",
+    "cursorrules"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "bin": {
+    "amulet": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}
