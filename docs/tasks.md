@@ -38,10 +38,10 @@ Tasks are worked through in order within each phase. Check off items as complete
 ## Phase 3 — Web App Foundation
 
 - [x] **T15** Scaffold `apps/web` as Next.js 15 app (App Router, TypeScript, Tailwind)
-- [x] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog)
-- [ ] **T17** Set up Supabase client helpers (`utils/supabase/server.ts`, `utils/supabase/client.ts`, `utils/supabase/middleware.ts`)
-- [ ] **T18** Auth middleware: protect `/dashboard` and `/new` routes, handle session refresh
-- [ ] **T19** Base layout: header (logo, search bar, login/logout, avatar), footer
+- [x] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog) — added via `shadcn add`
+- [x] **T17** Set up Supabase client helpers (`utils/supabase/server.ts`, `utils/supabase/client.ts`, `utils/supabase/middleware.ts`)
+- [x] **T18** Auth middleware: protect `/dashboard` and `/new` routes, handle session refresh
+- [x] **T19** Base layout: header (logo, search bar, login/logout, avatar), footer
 
 ---
 
