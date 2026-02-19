@@ -79,6 +79,7 @@ export type Database = {
           asset_format: string;
           created_at: string;
           description: string | null;
+          fts: unknown;
           id: string;
           is_public: boolean;
           name: string;
@@ -91,6 +92,7 @@ export type Database = {
           asset_format: string;
           created_at?: string;
           description?: string | null;
+          fts?: unknown;
           id?: string;
           is_public?: boolean;
           name: string;
@@ -103,6 +105,7 @@ export type Database = {
           asset_format?: string;
           created_at?: string;
           description?: string | null;
+          fts?: unknown;
           id?: string;
           is_public?: boolean;
           name?: string;

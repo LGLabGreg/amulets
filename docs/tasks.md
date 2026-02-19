@@ -47,14 +47,14 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 ## Phase 4 — API Routes
 
-- [ ] **T20** `POST /api/assets` — push simple asset (text content, create asset + version)
-- [ ] **T21** `POST /api/assets` — push skill package (multipart zip upload → Supabase Storage, store `file_manifest`)
-- [ ] **T22** `GET /api/assets/search` — full-text search on name + description, filter by type/tags/format
-- [ ] **T23** `GET /api/assets/:owner/:name` — asset metadata + latest version info
-- [ ] **T24** `GET /api/assets/:owner/:name/versions` — list all versions
-- [ ] **T25** `GET /api/assets/:owner/:name/:version` — return text content (simple) or signed storage URL (package)
-- [ ] **T26** `GET /api/me/assets` — list authenticated user's assets
-- [ ] **T27** `GET /api/me/collections` — list authenticated user's collections
+- [x] **T20** `POST /api/assets` — push simple asset (text content, create asset + version)
+- [x] **T21** `POST /api/assets` — push skill package (multipart zip upload → Supabase Storage, store `file_manifest`)
+- [x] **T22** `GET /api/assets/search` — full-text search on name + description, filter by type/tags/format
+- [x] **T23** `GET /api/assets/:owner/:name` — asset metadata + latest version info
+- [x] **T24** `GET /api/assets/:owner/:name/versions` — list all versions
+- [x] **T25** `GET /api/assets/:owner/:name/:version` — return text content (simple) or signed storage URL (package)
+- [x] **T26** `GET /api/me/assets` — list authenticated user's assets
+- [x] **T27** `GET /api/me/collections` — list authenticated user's collections
 
 ---
 

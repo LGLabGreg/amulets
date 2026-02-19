@@ -25,7 +25,8 @@
       "@biomejs/biome",
       "esbuild",
       "msw",
-      "sharp"
+      "sharp",
+      "supabase"
     ]
   }
 }
