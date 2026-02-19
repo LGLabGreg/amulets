@@ -60,17 +60,17 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 ## Phase 5 — CLI
 
-- [ ] **T28** Scaffold `packages/cli`: `package.json`, `tsconfig.json`, Commander.js entry point, build script
-- [ ] **T29** `amulet login` — open browser to Supabase GitHub OAuth URL, listen on localhost callback, save token to `~/.config/amulet/config.json`
-- [ ] **T30** `amulet logout` / `amulet whoami`
-- [ ] **T31** `amulet push <file>` — push simple asset (read file, POST to API)
-- [ ] **T32** `amulet push <folder>` — push skill package (detect `SKILL.md`, zip folder, multipart POST)
-- [ ] **T33** `amulet pull <owner/name>` (simple asset) — fetch text content, write to file
-- [ ] **T34** `amulet pull <owner/name>` (skill package) — fetch signed URL, download zip, unzip to `--output` dir
-- [ ] **T35** `amulet list` — list your assets (calls `GET /api/me/assets`)
-- [ ] **T36** `amulet search <query>` — search public registry
-- [ ] **T37** `amulet versions <owner/name>` — list versions of an asset
-- [ ] **T38** npm publish setup (`prepublishOnly` build, `bin` field, `files` array)
+- [x] **T28** Scaffold `packages/cli`: `package.json`, `tsconfig.json`, Commander.js entry point, build script
+- [x] **T29** `amulet login` — open browser to Supabase GitHub OAuth URL, listen on localhost callback, save token to `~/.config/amulet/config.json`
+- [x] **T30** `amulet logout` / `amulet whoami`
+- [x] **T31** `amulet push <file>` — push simple asset (read file, POST to API)
+- [x] **T32** `amulet push <folder>` — push skill package (detect `SKILL.md`, zip folder, multipart POST)
+- [x] **T33** `amulet pull <owner/name>` (simple asset) — fetch text content, write to file
+- [x] **T34** `amulet pull <owner/name>` (skill package) — fetch signed URL, download zip, unzip to `--output` dir
+- [x] **T35** `amulet list` — list your assets (calls `GET /api/me/assets`)
+- [x] **T36** `amulet search <query>` — search public registry
+- [x] **T37** `amulet versions <owner/name>` — list versions of an asset
+- [x] **T38** npm publish setup (`prepublishOnly` build, `bin` field, `files` array)
 
 ---
 

@@ -22,8 +22,17 @@
     "dev": "tsc --watch",
     "prepublishOnly": "pnpm build"
   },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "commander": "^12.1.0",
+    "open": "^8.4.2",
+    "ora": "^5.4.1",
+    "unzipper": "^0.12.3"
+  },
   "devDependencies": {
+    "@types/archiver": "^6.0.3",
     "@types/node": "^25.3.0",
+    "@types/unzipper": "^0.10.10",
     "typescript": "^5.9.3"
   }
 }
