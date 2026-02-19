@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--max-http-header-size=32768' next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_OPTIONS='--max-http-header-size=32768' next start",
     "gen-types": "supabase gen types typescript --linked 2>/dev/null > lib/database.types.ts"
   },
   "dependencies": {
+    "@base-ui/react": "^1.2.0",
+    "@hookform/resolvers": "5.2.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
     "class-variance-authority": "^0.7.1",
@@ -18,7 +20,12 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "tailwind-merge": "^3.5.0"
+    "react-hook-form": "7.71.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^3.22.0",
+    "tailwind-merge": "^3.5.0",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.0",

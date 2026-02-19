@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
-import { getAuthUser } from '@/utils/api-auth';
-import { createServiceClient } from '@/utils/supabase/service';
+import { NextResponse } from 'next/server'
+import { getAuthUser } from '@/utils/api-auth'
+import { createServiceClient } from '@/utils/supabase/service'
 
 export async function POST(request: Request) {
-  const user = await getAuthUser(request);
+  const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const service = createServiceClient();
+  const service = createServiceClient()
 
   // Upsert public user record (trigger handles new signups, this covers edge cases)
   await service.from('users').upsert(
@@ -19,27 +19,27 @@ export async function POST(request: Request) {
       avatar_url: user.user_metadata?.avatar_url ?? null,
     },
     { onConflict: 'id' },
-  );
+  )
 
-  const contentType = request.headers.get('content-type') ?? '';
+  const contentType = request.headers.get('content-type') ?? ''
 
   if (contentType.includes('multipart/form-data')) {
-    return handlePackagePush(request, user.id);
+    return handlePackagePush(request, user.id)
   }
 
-  return handleSimplePush(request, user.id);
+  return handleSimplePush(request, user.id)
 }
 
 async function handleSimplePush(request: Request, ownerId: string) {
-  const service = createServiceClient();
-  const body = await request.json();
-  const { name, slug, description, type, tags, version, message, content } = body;
+  const service = createServiceClient()
+  const body = await request.json()
+  const { name, slug, description, type, tags, version, message, content } = body
 
   if (!name || !slug || !version || !content) {
     return NextResponse.json(
       { error: 'name, slug, version, and content are required' },
       { status: 400 },
-    );
+    )
   }
 
   const { data: asset, error: assetError } = await service
@@ -57,51 +57,51 @@ async function handleSimplePush(request: Request, ownerId: string) {
       { onConflict: 'owner_id,slug' },
     )
     .select()
-    .single();
+    .single()
 
   if (assetError || !asset) {
     return NextResponse.json(
       { error: assetError?.message ?? 'Failed to create asset' },
       { status: 500 },
-    );
+    )
   }
 
   const { data: assetVersion, error: versionError } = await service
     .from('asset_versions')
     .insert({ asset_id: asset.id, version, message: message ?? null, content })
     .select()
-    .single();
+    .single()
 
   if (versionError) {
-    return NextResponse.json({ error: versionError.message }, { status: 409 });
+    return NextResponse.json({ error: versionError.message }, { status: 409 })
   }
 
-  return NextResponse.json({ asset, version: assetVersion }, { status: 201 });
+  return NextResponse.json({ asset, version: assetVersion }, { status: 201 })
 }
 
 async function handlePackagePush(request: Request, ownerId: string) {
-  const service = createServiceClient();
-  const formData = await request.formData();
+  const service = createServiceClient()
+  const formData = await request.formData()
 
-  const metadataStr = formData.get('metadata') as string | null;
-  const fileManifestStr = formData.get('file_manifest') as string | null;
-  const packageFile = formData.get('package') as File | null;
+  const metadataStr = formData.get('metadata') as string | null
+  const fileManifestStr = formData.get('file_manifest') as string | null
+  const packageFile = formData.get('package') as File | null
 
   if (!metadataStr || !fileManifestStr || !packageFile) {
     return NextResponse.json(
       { error: 'metadata, file_manifest, and package are required' },
       { status: 400 },
-    );
+    )
   }
 
-  const { name, slug, description, type, tags, version, message } = JSON.parse(metadataStr);
-  const file_manifest = JSON.parse(fileManifestStr);
+  const { name, slug, description, type, tags, version, message } = JSON.parse(metadataStr)
+  const file_manifest = JSON.parse(fileManifestStr)
 
   if (!name || !slug || !version) {
     return NextResponse.json(
       { error: 'name, slug, and version are required in metadata' },
       { status: 400 },
-    );
+    )
   }
 
   const { data: asset, error: assetError } = await service
@@ -119,27 +119,27 @@ async function handlePackagePush(request: Request, ownerId: string) {
       { onConflict: 'owner_id,slug' },
     )
     .select()
-    .single();
+    .single()
 
   if (assetError || !asset) {
     return NextResponse.json(
       { error: assetError?.message ?? 'Failed to create asset' },
       { status: 500 },
-    );
+    )
   }
 
-  const storagePath = `${ownerId}/${slug}/${version}.zip`;
-  const buffer = await packageFile.arrayBuffer();
+  const storagePath = `${ownerId}/${slug}/${version}.zip`
+  const buffer = await packageFile.arrayBuffer()
 
   const { error: storageError } = await service.storage
     .from('packages')
     .upload(storagePath, buffer, {
       contentType: 'application/zip',
       upsert: false,
-    });
+    })
 
   if (storageError) {
-    return NextResponse.json({ error: storageError.message }, { status: 409 });
+    return NextResponse.json({ error: storageError.message }, { status: 409 })
   }
 
   const { data: assetVersion, error: versionError } = await service
@@ -152,12 +152,12 @@ async function handlePackagePush(request: Request, ownerId: string) {
       file_manifest,
     })
     .select()
-    .single();
+    .single()
 
   if (versionError) {
-    await service.storage.from('packages').remove([storagePath]);
-    return NextResponse.json({ error: versionError.message }, { status: 409 });
+    await service.storage.from('packages').remove([storagePath])
+    return NextResponse.json({ error: versionError.message }, { status: 409 })
   }
 
-  return NextResponse.json({ asset, version: assetVersion }, { status: 201 });
+  return NextResponse.json({ asset, version: assetVersion }, { status: 201 })
 }

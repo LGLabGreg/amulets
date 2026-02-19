@@ -76,13 +76,13 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 ## Phase 6 — Web UI (MVP pages)
 
-- [ ] **T39** `/` Landing page: hero text, search bar, featured/recent assets
-- [ ] **T40** `/explore` page: browse public assets, filter by type/tag/format, paginated
-- [ ] **T41** `/:owner/:name` asset detail page — simple asset: render `SKILL.md` / markdown content with Shiki
-- [ ] **T42** `/:owner/:name` asset detail page — skill package: render `SKILL.md` + file tree from `file_manifest`
-- [ ] **T43** `/:owner/:name/:version` — version detail with diff vs previous (simple asset: text diff; package: file tree diff)
-- [ ] **T44** `/dashboard` — list your assets + collections (authed)
-- [ ] **T45** `/new` — push asset via web form (text input for simple assets, zip upload for packages)
+- [x] **T39** `/` Landing page: hero text, search bar, featured/recent assets
+- [x] **T40** `/explore` page: browse public assets, filter by type/tag/format, paginated
+- [x] **T41** `/:owner/:name` asset detail page — simple asset: render `SKILL.md` / markdown content with Shiki
+- [x] **T42** `/:owner/:name` asset detail page — skill package: render `SKILL.md` + file tree from `file_manifest`
+- [x] **T43** `/:owner/:name/:version` — version detail with diff vs previous (simple asset: text diff; package: file tree diff)
+- [x] **T44** `/dashboard` — list your assets + collections (authed)
+- [x] **T45** `/new` — push asset via web form (text input for simple assets, zip upload for packages)
 
 ---
 

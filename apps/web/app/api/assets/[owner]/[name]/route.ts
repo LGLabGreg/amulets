@@ -1,21 +1,21 @@
-import { NextResponse } from 'next/server';
-import { createServiceClient } from '@/utils/supabase/service';
+import { NextResponse } from 'next/server'
+import { createServiceClient } from '@/utils/supabase/service'
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ owner: string; name: string }> },
 ) {
-  const { owner, name } = await params;
-  const service = createServiceClient();
+  const { owner, name } = await params
+  const service = createServiceClient()
 
   const { data: userRecord } = await service
     .from('users')
     .select('id')
     .eq('username', owner)
-    .single();
+    .single()
 
   if (!userRecord) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   const { data: asset, error } = await service
@@ -28,11 +28,11 @@ export async function GET(
       referencedTable: 'asset_versions',
       ascending: false,
     })
-    .single();
+    .single()
 
   if (error || !asset) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ asset });
+  return NextResponse.json({ asset })
 }

@@ -1,14 +1,14 @@
-import Link from 'next/link';
-import { signInWithGitHub, signOut } from '@/app/auth/actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { createClient } from '@/utils/supabase/server';
+import Link from 'next/link'
+import { signInWithGitHub, signOut } from '@/app/auth/actions'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function Header() {
-  const supabase = await createClient();
+  const supabase = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser()
 
   return (
     <header className="border-b border-border bg-background">
@@ -28,6 +28,12 @@ export default async function Header() {
 
           {user ? (
             <>
+              <Link
+                href="/new"
+                className="text-sm text-muted-foreground hover:text-foreground border border-border px-2 py-1"
+              >
+                + New
+              </Link>
               <Link href="/dashboard">
                 {user.user_metadata?.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -56,5 +62,5 @@ export default async function Header() {
         </nav>
       </div>
     </header>
-  );
+  )
 }
