@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Amulet — npm for AI workflow files',
+  title: 'Amulets — npm for AI workflow files',
   description: 'A registry for AI workflow assets: prompts, skills, cursorrules, and more.',
 };
 

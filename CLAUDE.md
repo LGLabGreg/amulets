@@ -1,4 +1,4 @@
-# Amulet — Claude Code Instructions
+# Amulets — Claude Code Instructions
 
 ## Project Overview
 
@@ -11,7 +11,7 @@ A CLI-first registry for AI workflow assets (prompts, skills, `.cursorrules`, `A
 apps/
   web/          # Next.js 15 App Router — web UI + API routes
 packages/
-  cli/          # TypeScript CLI, published to npm as amulet-cli
+  cli/          # TypeScript CLI, published to npm as amulets-cli
 docs/
   project-outline.md   # Full spec, data model, roadmap
   tasks.md             # Master task list
@@ -52,7 +52,7 @@ pnpm format               # Biome format
 - Commander.js for argument parsing
 - `archiver` for zipping skill packages, `unzipper` for unpacking
 - `ora` for spinners
-- Credentials stored in `~/.config/amulet/config.json`
+- Credentials stored in `~/.config/amulets/config.json`
 
 ### Database
 
@@ -69,7 +69,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-CLI reads from `~/.config/amulet/config.json` (written by `amulet login`).
+CLI reads from `~/.config/amulets/config.json` (written by `amulets login`).
 
 ## Key Architectural Decisions
 
@@ -89,7 +89,7 @@ CLI reads from `~/.config/amulet/config.json` (written by `amulet login`).
    ---
    ```
 
-Auto-detection on `amulet push`: if a folder is passed and contains `SKILL.md` → skill package. Otherwise → simple asset.
+Auto-detection on `amulets push`: if a folder is passed and contains `SKILL.md` → skill package. Otherwise → simple asset.
 
 ## Data Model (key tables)
 

@@ -1,7 +1,7 @@
 {
-  "name": "amulet-cli",
+  "name": "amulets-cli",
   "version": "0.1.0",
-  "description": "CLI for the Amulet registry — push and pull AI workflow assets",
+  "description": "CLI for the Amulets registry — push and pull AI workflow assets",
   "keywords": [
     "ai",
     "cli",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "bin": {
-    "amulet": "dist/index.js"
+    "amulets": "dist/index.js"
   },
   "files": [
     "dist"

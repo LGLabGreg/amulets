@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground">
         <span>
           <Link href="/" className="font-mono font-semibold">
-            amulet
+            amulets
           </Link>{' '}
           — npm for AI workflow files
         </span>

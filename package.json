@@ -1,9 +1,9 @@
 {
-  "name": "amulet",
+  "name": "amulets",
   "private": true,
   "scripts": {
     "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build && pnpm --filter amulet-cli build",
+    "build": "pnpm --filter web build && pnpm --filter amulets-cli build",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",

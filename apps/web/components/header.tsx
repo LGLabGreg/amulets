@@ -14,7 +14,7 @@ export default async function Header() {
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
         <Link href="/" className="font-mono text-lg font-bold tracking-tight">
-          amulet
+          amulets
         </Link>
 
         <form action="/explore" className="flex-1 max-w-sm">
