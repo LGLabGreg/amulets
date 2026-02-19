@@ -18,27 +18,27 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 ## Phase 1 — Infrastructure (manual setup, you do these)
 
-- [ ] **T06** Create Supabase project → copy `SUPABASE_URL`, `ANON_KEY`, `SERVICE_ROLE_KEY` into `apps/web/.env.local`
-- [ ] **T07** Create GitHub OAuth App (Settings → Developer Settings → OAuth Apps) → copy `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` into Supabase Auth dashboard
-- [ ] **T08** Create Supabase Storage bucket named `packages` (public bucket, for skill package zips)
+- [x] **T06** Create Supabase project → copy `SUPABASE_URL`, `ANON_KEY`, `SERVICE_ROLE_KEY` into `apps/web/.env.local`
+- [x] **T07** Create GitHub OAuth App (Settings → Developer Settings → OAuth Apps) → copy `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` into Supabase Auth dashboard
+- [x] **T08** Create Supabase Storage bucket named `packages` (public bucket, for skill package zips)
 
 ---
 
 ## Phase 2 — Database Schema
 
-- [ ] **T09** Migration: `users` table + RLS (insert/select own row)
-- [ ] **T10** Migration: `assets` table + RLS (public read, owner write)
-- [ ] **T11** Migration: `asset_versions` table + RLS
-- [ ] **T12** Migration: `collections` + `collection_items` tables + RLS
-- [ ] **T13** Migration: DB indexes (owner slug lookups, search on name/description)
-- [ ] **T14** Apply migrations to Supabase project (via Supabase CLI or dashboard)
+- [x] **T09** Migration: `users` table + RLS (insert/select own row)
+- [x] **T10** Migration: `assets` table + RLS (public read, owner write)
+- [x] **T11** Migration: `asset_versions` table + RLS
+- [x] **T12** Migration: `collections` + `collection_items` tables + RLS
+- [x] **T13** Migration: DB indexes (owner slug lookups, search on name/description)
+- [x] **T14** Apply migrations to Supabase project (via Supabase CLI or dashboard)
 
 ---
 
 ## Phase 3 — Web App Foundation
 
-- [ ] **T15** Scaffold `apps/web` as Next.js 15 app (App Router, TypeScript, Tailwind)
-- [ ] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog)
+- [x] **T15** Scaffold `apps/web` as Next.js 15 app (App Router, TypeScript, Tailwind)
+- [x] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog)
 - [ ] **T17** Set up Supabase client helpers (`utils/supabase/server.ts`, `utils/supabase/client.ts`, `utils/supabase/middleware.ts`)
 - [ ] **T18** Auth middleware: protect `/dashboard` and `/new` routes, handle session refresh
 - [ ] **T19** Base layout: header (logo, search bar, login/logout, avatar), footer
