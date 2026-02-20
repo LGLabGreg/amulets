@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/utils/api-auth'
 import { createServiceClient } from '@/utils/supabase/service'
 
+const VALID_TYPES = ['skill', 'prompt', 'cursorrules', 'agentsmd', 'config'] as const
+
 export async function POST(request: Request) {
   const user = await getAuthUser(request)
   if (!user) {
@@ -33,11 +35,25 @@ export async function POST(request: Request) {
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
-  const { name, slug, description, type, tags, version, message, content } = body
+  const { name, slug, description, type, tags, version, message, content, is_public } = body
 
   if (!name || !slug || !version || !content) {
     return NextResponse.json(
       { error: 'name, slug, version, and content are required' },
+      { status: 400 },
+    )
+  }
+
+  if (version === 'latest') {
+    return NextResponse.json(
+      { error: '"latest" is a reserved version identifier' },
+      { status: 400 },
+    )
+  }
+
+  if (type && !VALID_TYPES.includes(type)) {
+    return NextResponse.json(
+      { error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` },
       { status: 400 },
     )
   }
@@ -53,6 +69,7 @@ async function handleSimplePush(request: Request, ownerId: string) {
         asset_format: 'file',
         type: type ?? null,
         tags: tags ?? [],
+        is_public: is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -94,12 +111,27 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  const { name, slug, description, type, tags, version, message } = JSON.parse(metadataStr)
+  const { name, slug, description, type, tags, version, message, is_public } =
+    JSON.parse(metadataStr)
   const file_manifest = JSON.parse(fileManifestStr)
 
   if (!name || !slug || !version) {
     return NextResponse.json(
       { error: 'name, slug, and version are required in metadata' },
+      { status: 400 },
+    )
+  }
+
+  if (version === 'latest') {
+    return NextResponse.json(
+      { error: '"latest" is a reserved version identifier' },
+      { status: 400 },
+    )
+  }
+
+  if (type && !VALID_TYPES.includes(type)) {
+    return NextResponse.json(
+      { error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` },
       { status: 400 },
     )
   }
@@ -115,6 +147,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
         asset_format: 'package',
         type: type ?? null,
         tags: tags ?? [],
+        is_public: is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -126,6 +159,11 @@ async function handlePackagePush(request: Request, ownerId: string) {
       { error: assetError?.message ?? 'Failed to create asset' },
       { status: 500 },
     )
+  }
+
+  const MAX_PACKAGE_SIZE = 4 * 1024 * 1024 // 4MB
+  if (packageFile.size > MAX_PACKAGE_SIZE) {
+    return NextResponse.json({ error: 'Package exceeds 4MB limit' }, { status: 413 })
   }
 
   const storagePath = `${ownerId}/${slug}/${version}.zip`

@@ -143,6 +143,31 @@ export async function exchangeCodeForToken(
   return res.json() as Promise<TokenResponse>
 }
 
+export async function refreshAccessToken(refreshToken: string): Promise<TokenResponse> {
+  const supabaseUrl = getSupabaseUrl()
+  const anonKey = getSupabaseAnonKey()
+
+  const body = new URLSearchParams({
+    refresh_token: refreshToken,
+  })
+
+  const res = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      apikey: anonKey,
+    },
+    body: body.toString(),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Token refresh failed: ${text}`)
+  }
+
+  return res.json() as Promise<TokenResponse>
+}
+
 export async function getSupabaseUser(token: string): Promise<{
   id: string
   email?: string

@@ -16,6 +16,7 @@ async function searchAssets(params: SearchParams) {
     .from('assets')
     .select('*, users(username, avatar_url), asset_versions(version, created_at)')
     .eq('is_public', true)
+    .eq('is_reported', false)
 
   if (params.q) {
     query = query.textSearch('fts', params.q, { type: 'websearch', config: 'english' })
@@ -39,9 +40,10 @@ export default async function ExplorePage({
     <div className="mx-auto max-w-6xl px-4 py-10">
       {/* Header */}
       <div className="mb-8 border-b border-border pb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Explore</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Public Assets</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Browse the public registry of AI workflow assets.
+          Browse public AI workflow assets shared by the community. Review content before use. Pull
+          via CLI with <code className="font-mono text-xs">--approve</code>.
         </p>
       </div>
 

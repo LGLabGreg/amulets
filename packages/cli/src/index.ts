@@ -5,7 +5,6 @@ import { registerLogin } from './commands/login.js'
 import { registerLogout } from './commands/logout.js'
 import { registerPull } from './commands/pull.js'
 import { registerPush } from './commands/push.js'
-import { registerSearch } from './commands/search.js'
 import { registerVersions } from './commands/versions.js'
 import { registerWhoami } from './commands/whoami.js'
 
@@ -22,7 +21,6 @@ registerWhoami(program)
 registerPush(program)
 registerPull(program)
 registerList(program)
-registerSearch(program)
 registerVersions(program)
 
 program.parse()

@@ -1,9 +1,12 @@
-import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { MarkdownContent } from '@/components/markdown-content'
+import { notFound } from 'next/navigation'
+import { CopyButton } from '@/components/copy-button'
 import { FileTree } from '@/components/file-tree'
+import { MarkdownContent } from '@/components/markdown-content'
+import { ReportButton } from '@/components/report-button'
+import { Badge } from '@/components/ui/badge'
+import { createClient } from '@/utils/supabase/server'
 import { createServiceClient } from '@/utils/supabase/service'
 
 interface FileEntry {
@@ -34,7 +37,6 @@ async function getAsset(owner: string, name: string) {
     )
     .eq('owner_id', userRecord.id)
     .eq('slug', name)
-    .eq('is_public', true)
     .order('created_at', { referencedTable: 'asset_versions', ascending: false })
     .single()
 
@@ -45,11 +47,21 @@ async function getAsset(owner: string, name: string) {
 
 export default async function AssetDetailPage({ params }: { params: Promise<PageParams> }) {
   const { owner, name } = await params
-  const result = await getAsset(owner, name)
 
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const result = await getAsset(owner, name)
   if (!result) notFound()
 
   const { asset } = result
+  const isOwner = !!user && user.id === result.owner.id
+
+  // Private assets are only visible to their owner
+  if (!asset.is_public && !isOwner) notFound()
+
   const versions = asset.asset_versions as {
     id: string
     version: string
@@ -61,6 +73,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
   }[]
 
   const latest = versions[0]
+  const showReportButton = asset.is_public && !!user && !isOwner
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -105,6 +118,9 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
             <Badge variant="outline" className="font-mono text-xs">
               {asset.asset_format === 'package' ? 'skill package' : 'file'}
             </Badge>
+            <Badge variant={asset.is_public ? 'default' : 'outline'} className="font-mono text-xs">
+              {asset.is_public ? 'public' : 'private'}
+            </Badge>
             {(asset.tags ?? []).map((tag: string) => (
               <Badge key={tag} variant="outline" className="font-mono text-xs">
                 {tag}
@@ -113,14 +129,26 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
           </div>
 
           {/* Pull command */}
-          <div className="mb-8 border border-border bg-muted/30 px-4 py-3">
+          <div className="mb-4 border border-border bg-muted/30 px-4 py-3">
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Pull this asset
+              Pull via CLI
             </p>
             <pre className="font-mono text-sm text-foreground select-all">
-              amulets pull {owner}/{name}
+              {isOwner
+                ? `amulets pull ${owner}/${name}`
+                : `amulets pull ${owner}/${name} --approve`}
             </pre>
           </div>
+
+          {/* Copy content button — only for public simple assets */}
+          {asset.is_public && asset.asset_format === 'file' && latest?.content && (
+            <div className="mb-8 border border-border bg-muted/30 px-4 py-3 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Copy content
+              </p>
+              <CopyButton text={latest.content} label="Copy to clipboard" />
+            </div>
+          )}
 
           {/* Content */}
           <div>
@@ -210,6 +238,13 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
               })}
             </p>
           </div>
+
+          {/* Report button */}
+          {showReportButton && (
+            <div>
+              <ReportButton owner={owner} name={name} />
+            </div>
+          )}
         </div>
       </div>
     </div>

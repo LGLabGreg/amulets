@@ -31,15 +31,13 @@ export class ApiError extends Error {
 
 async function request<T>(
   path: string,
-  options: RequestInit & { token?: string } = {},
+  options: RequestInit & { token?: string; headers?: Record<string, string> } = {},
 ): Promise<T> {
-  const { token, ...fetchOptions } = options
+  const { token, headers: extraHeaders, ...fetchOptions } = options
   const apiUrl = getApiUrl()
   const url = `${apiUrl}${path}`
 
-  const headers: Record<string, string> = {
-    ...(fetchOptions.headers as Record<string, string>),
-  }
+  const headers: Record<string, string> = { ...extraHeaders }
   if (token) headers.Authorization = `Bearer ${token}`
 
   const res = await fetch(url, { ...fetchOptions, headers })
@@ -69,6 +67,7 @@ export async function pushSimpleAsset(
     version: string
     message?: string
     content: string
+    is_public?: boolean
   },
 ): Promise<{ asset: Asset; version: AssetVersion }> {
   return request('/api/assets', {
@@ -94,28 +93,32 @@ export async function getAssetVersion(
   owner: string,
   name: string,
   version: string,
-): Promise<{ version: string; content?: string; download_url?: string; file_manifest?: unknown }> {
-  return request(`/api/assets/${owner}/${name}/${version}`)
+  token: string,
+  extraHeaders?: Record<string, string>,
+): Promise<{
+  version: string
+  content?: string
+  download_url?: string
+  file_manifest?: unknown
+  message?: string
+  created_at?: string
+  asset_format?: string
+  review_url?: string
+}> {
+  return request(`/api/assets/${owner}/${name}/${version}`, {
+    token,
+    headers: extraHeaders,
+  })
 }
 
 export async function getAssetVersions(
   owner: string,
   name: string,
+  token: string,
 ): Promise<{
   versions: Array<{ id: string; version: string; message: string | null; created_at: string }>
 }> {
-  return request(`/api/assets/${owner}/${name}/versions`)
-}
-
-export async function searchAssets(
-  q: string,
-  filters: { type?: string; format?: string; tags?: string[] } = {},
-): Promise<{ assets: Array<Asset & { users?: { username: string; avatar_url: string | null } }> }> {
-  const params = new URLSearchParams({ q })
-  if (filters.type) params.set('type', filters.type)
-  if (filters.format) params.set('format', filters.format)
-  for (const tag of filters.tags ?? []) params.append('tags', tag)
-  return request(`/api/assets/search?${params.toString()}`)
+  return request(`/api/assets/${owner}/${name}/versions`, { token })
 }
 
 export async function listMyAssets(token: string): Promise<{

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceClient } from '@/utils/supabase/service'
 
+const VALID_TYPES = ['skill', 'prompt', 'cursorrules', 'agentsmd', 'config'] as const
+
 interface CreateAssetValues {
   name: string
   slug: string
@@ -12,6 +14,7 @@ interface CreateAssetValues {
   version: string
   message?: string
   content: string
+  is_public?: boolean
 }
 
 export async function createAssetAction(values: CreateAssetValues): Promise<{ error: string }> {
@@ -22,6 +25,10 @@ export async function createAssetAction(values: CreateAssetValues): Promise<{ er
 
   if (!user) {
     return { error: 'Unauthorized. Please sign in.' }
+  }
+
+  if (values.type && !VALID_TYPES.includes(values.type as (typeof VALID_TYPES)[number])) {
+    return { error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` }
   }
 
   const service = createServiceClient()
@@ -46,7 +53,7 @@ export async function createAssetAction(values: CreateAssetValues): Promise<{ er
         asset_format: 'file',
         type: values.type,
         tags: [],
-        is_public: true,
+        is_public: values.is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )

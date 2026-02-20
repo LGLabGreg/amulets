@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { AssetCard } from '@/components/asset-card'
+import { Button } from '@/components/ui/button'
 import { createServiceClient } from '@/utils/supabase/service'
 
 async function getRecentAssets() {
@@ -27,8 +27,8 @@ export default async function Home() {
             npm for AI workflow files
           </h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-            Push and pull prompts, skills, and cursor rules with a single command.
-            Version-controlled. Open registry.
+            Push, pull, and sync your AI workflow assets across projects. Private by default. Browse
+            public skills and prompts shared by the community.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -62,14 +62,16 @@ export default async function Home() {
               </pre>
             </div>
             <div className="py-4 sm:py-0 sm:px-6">
-              <p className="mb-2 font-semibold">Pull anywhere</p>
+              <p className="mb-2 font-semibold">Pull your asset</p>
               <pre className="font-mono text-sm text-muted-foreground">
-                amulets pull alice/my-prompt
+                amulets pull myuser/my-prompt
               </pre>
             </div>
             <div className="py-4 sm:py-0 sm:px-6 last:pr-0">
-              <p className="mb-2 font-semibold">Search the registry</p>
-              <pre className="font-mono text-sm text-muted-foreground">amulets search docx</pre>
+              <p className="mb-2 font-semibold">Pull a public asset</p>
+              <pre className="font-mono text-sm text-muted-foreground">
+                amulets pull dev/skill --approve
+              </pre>
             </div>
           </div>
         </div>

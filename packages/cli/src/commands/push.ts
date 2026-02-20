@@ -66,6 +66,7 @@ export function registerPush(program: Command): void {
     .command('push <path>')
     .description('Push an asset (file or skill package folder) to the registry')
     .requiredOption('--name <name>', 'Asset name')
+    .option('--public', 'Make this asset publicly visible')
     .option('--version <version>', 'Version (semver)', '1.0.0')
     .option('--message <message>', 'Version message')
     .option('--tags <tags>', 'Comma-separated tags (e.g. claude,prompt)')
@@ -76,6 +77,7 @@ export function registerPush(program: Command): void {
         assetPath: string,
         options: {
           name: string
+          public?: boolean
           version: string
           message?: string
           tags?: string
@@ -83,7 +85,8 @@ export function registerPush(program: Command): void {
           description?: string
         },
       ) => {
-        const token = requireToken()
+        const token = await requireToken()
+        const isPublic = options.public === true
         const resolvedPath = path.resolve(assetPath)
 
         if (!fs.existsSync(resolvedPath)) {
@@ -130,6 +133,7 @@ export function registerPush(program: Command): void {
                 tags,
                 version: options.version,
                 message: options.message,
+                is_public: isPublic,
               }),
             )
             formData.append('file_manifest', JSON.stringify(fileManifest))
@@ -144,8 +148,9 @@ export function registerPush(program: Command): void {
             )
 
             const result = await pushPackageAsset(token, formData)
+            const visibility = isPublic ? 'public' : 'private'
             spinner.succeed(
-              `Pushed skill package: ${result.asset.slug} @ ${result.version.version}`,
+              `Pushed ${visibility} skill package: ${result.asset.slug} @ ${result.version.version}`,
             )
           } else {
             // Simple asset (single file)
@@ -162,8 +167,12 @@ export function registerPush(program: Command): void {
               version: options.version,
               message: options.message,
               content,
+              is_public: isPublic,
             })
-            spinner.succeed(`Pushed asset: ${result.asset.slug} @ ${result.version.version}`)
+            const visibility = isPublic ? 'public' : 'private'
+            spinner.succeed(
+              `Pushed ${visibility} asset: ${result.asset.slug} @ ${result.version.version}`,
+            )
           }
         } catch (err) {
           const message = err instanceof ApiError ? err.message : String(err)

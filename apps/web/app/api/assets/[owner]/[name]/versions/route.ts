@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
+import { getAuthUser } from '@/utils/api-auth'
 import { createServiceClient } from '@/utils/supabase/service'
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ owner: string; name: string }> },
 ) {
   const { owner, name } = await params
   const service = createServiceClient()
+
+  const user = await getAuthUser(request)
 
   const { data: userRecord } = await service
     .from('users')
@@ -20,13 +23,18 @@ export async function GET(
 
   const { data: asset } = await service
     .from('assets')
-    .select('id')
+    .select('id, is_public')
     .eq('owner_id', userRecord.id)
     .eq('slug', name)
-    .eq('is_public', true)
     .single()
 
   if (!asset) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  const isOwner = user?.id === userRecord.id
+
+  if (!asset.is_public && !isOwner) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 

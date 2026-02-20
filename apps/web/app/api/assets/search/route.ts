@@ -10,7 +10,11 @@ export async function GET(request: Request) {
 
   const service = createServiceClient()
 
-  let query = service.from('assets').select('*, users(username, avatar_url)').eq('is_public', true)
+  let query = service
+    .from('assets')
+    .select('*, users(username, avatar_url)')
+    .eq('is_public', true)
+    .eq('is_reported', false)
 
   if (q) {
     query = query.textSearch('fts', q, {

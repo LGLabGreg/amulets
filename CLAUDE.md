@@ -30,6 +30,13 @@ pnpm lint                 # Biome lint
 pnpm format               # Biome format
 ```
 
+**Always install packages with `@latest`** — never hardcode a version number from memory. Training data versions are stale.
+
+```bash
+pnpm --filter web add some-package@latest
+pnpm --filter amulets-cli add some-package@latest
+```
+
 ## Code Style
 
 - **Biome** for linting and formatting (not ESLint/Prettier)

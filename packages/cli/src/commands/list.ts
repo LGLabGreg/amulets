@@ -8,7 +8,7 @@ export function registerList(program: Command): void {
     .command('list')
     .description('List your assets')
     .action(async () => {
-      const token = requireToken()
+      const token = await requireToken()
       const spinner = ora('Fetching your assets...').start()
 
       try {

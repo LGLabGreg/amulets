@@ -7,7 +7,7 @@ export function registerWhoami(program: Command): void {
     .command('whoami')
     .description('Show the currently authenticated user')
     .action(async () => {
-      const token = requireToken()
+      const token = await requireToken()
 
       try {
         const user = await getSupabaseUser(token)

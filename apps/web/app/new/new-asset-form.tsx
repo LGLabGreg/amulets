@@ -1,19 +1,10 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -21,16 +12,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { createAssetAction } from './actions';
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { createAssetAction } from './actions'
 
-const ASSET_TYPES = [
-  'prompt',
-  'skill',
-  'cursorrules',
-  'agents-md',
-  'other',
-] as const;
+const ASSET_TYPES = ['prompt', 'skill', 'cursorrules', 'agents-md', 'other'] as const
 
 const schema = z.object({
   name: z.string().min(1, 'Required'),
@@ -39,20 +33,21 @@ const schema = z.object({
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Must be semver e.g. 1.0.0'),
   message: z.string().optional(),
   content: z.string().min(1, 'Required'),
-});
+  is_public: z.boolean().optional(),
+})
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof schema>
 
 function toSlug(name: string): string {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, '-')
     .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/^-|-$/g, '')
 }
 
 export function NewAssetForm({ username }: { username: string }) {
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -63,49 +58,43 @@ export function NewAssetForm({ username }: { username: string }) {
       version: '1.0.0',
       message: '',
       content: '',
+      is_public: false,
     },
-  });
+  })
 
-  const nameValue = form.watch('name');
-  const previewSlug = nameValue ? toSlug(nameValue) : 'my-asset';
+  const nameValue = form.watch('name')
+  const previewSlug = nameValue ? toSlug(nameValue) : 'my-asset'
 
   async function onSubmit(values: FormValues) {
-    setServerError(null);
-    const slug = toSlug(values.name);
-    const result = await createAssetAction({ ...values, slug });
+    setServerError(null)
+    const slug = toSlug(values.name)
+    const result = await createAssetAction({ ...values, slug })
     if (result?.error) {
-      setServerError(result.error);
+      setServerError(result.error)
     }
   }
 
-  const isLoading = form.formState.isSubmitting;
+  const isLoading = form.formState.isSubmitting
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='space-y-0 border border-border'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-0 border border-border">
         {/* Name */}
-        <div className='border-b border-border p-4'>
+        <div className="border-b border-border p-4">
           <FormField
             control={form.control}
-            name='name'
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Name<span className='text-destructive'>*</span>
+                  Name<span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    placeholder='my-system-prompt'
-                    className='font-mono'
-                  />
+                  <Input {...field} placeholder="my-system-prompt" className="font-mono" />
                 </FormControl>
-                <p className='text-xs text-muted-foreground'>
+                <p className="text-xs text-muted-foreground">
                   Will be published as{' '}
-                  <span className='font-mono text-foreground'>
+                  <span className="font-mono text-foreground">
                     {username}/{previewSlug}
                   </span>
                 </p>
@@ -116,18 +105,15 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Description */}
-        <div className='border-b border-border p-4'>
+        <div className="border-b border-border p-4">
           <FormField
             control={form.control}
-            name='description'
+            name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    placeholder='A short description of what this asset does'
-                  />
+                  <Input {...field} placeholder="A short description of what this asset does" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,17 +122,17 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Type + Version row */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border border-b border-border'>
-          <div className='p-4'>
+        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border border-b border-border">
+          <div className="p-4">
             <FormField
               control={form.control}
-              name='type'
+              name="type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className='w-full font-mono'>
+                      <SelectTrigger className="w-full font-mono">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -163,19 +149,15 @@ export function NewAssetForm({ username }: { username: string }) {
               )}
             />
           </div>
-          <div className='p-4'>
+          <div className="p-4">
             <FormField
               control={form.control}
-              name='version'
+              name="version"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Version</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder='1.0.0'
-                      className='font-mono'
-                    />
+                    <Input {...field} placeholder="1.0.0" className="font-mono" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,15 +167,15 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Release notes */}
-        <div className='border-b border-border p-4'>
+        <div className="border-b border-border p-4">
           <FormField
             control={form.control}
-            name='message'
+            name="message"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Release notes</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder='Initial release' />
+                  <Input {...field} placeholder="Initial release" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,21 +184,21 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Content */}
-        <div className='border-b border-border p-4'>
+        <div className="border-b border-border p-4">
           <FormField
             control={form.control}
-            name='content'
+            name="content"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Content<span className='text-destructive'>*</span>
+                  Content<span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder='Paste your prompt, cursorrules, or markdown content here…'
+                    placeholder="Paste your prompt, cursorrules, or markdown content here…"
                     rows={16}
-                    className='font-mono resize-y'
+                    className="font-mono resize-y"
                   />
                 </FormControl>
                 <FormMessage />
@@ -225,27 +207,50 @@ export function NewAssetForm({ username }: { username: string }) {
           />
         </div>
 
+        {/* Visibility toggle */}
+        <div className="border-b border-border p-4">
+          <FormField
+            control={form.control}
+            name="is_public"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_public"
+                    checked={field.value ?? false}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                  <label htmlFor="is_public" className="text-sm cursor-pointer">
+                    Make this asset public
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Public assets are visible on the website. Others must use{' '}
+                  <span className="font-mono">--approve</span> to pull them.
+                </p>
+              </FormItem>
+            )}
+          />
+        </div>
+
         {/* Package note */}
-        <div className='border-b border-border bg-muted/30 px-4 py-3'>
-          <p className='text-xs text-muted-foreground'>
-            <span className='font-semibold'>Pushing a skill package?</span> Use
-            the CLI:{' '}
-            <span className='font-mono'>amulets push ./my-skill-folder</span>
+        <div className="border-b border-border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            <span className="font-semibold">Pushing a skill package?</span> Use the CLI:{' '}
+            <span className="font-mono">amulets push ./my-skill-folder</span>
           </p>
         </div>
 
         {/* Error + Submit */}
-        <div className='flex items-center justify-between gap-4 p-4'>
-          {serverError ? (
-            <p className='text-sm text-destructive'>{serverError}</p>
-          ) : (
-            <span />
-          )}
-          <Button type='submit' disabled={isLoading}>
+        <div className="flex items-center justify-between gap-4 p-4">
+          {serverError ? <p className="text-sm text-destructive">{serverError}</p> : <span />}
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? 'Publishing…' : 'Publish asset'}
           </Button>
         </div>
       </form>
     </Form>
-  );
+  )
 }

@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
+import { getAuthUser } from '@/utils/api-auth'
 import { createServiceClient } from '@/utils/supabase/service'
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ owner: string; name: string; version: string }> },
 ) {
   const { owner, name, version } = await params
   const service = createServiceClient()
+
+  const user = await getAuthUser(request)
 
   const { data: userRecord } = await service
     .from('users')
@@ -25,7 +28,16 @@ export async function GET(
     .eq('slug', name)
     .single()
 
-  if (!asset || !asset.is_public) {
+  if (!asset) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  const isOwner = user?.id === userRecord.id
+  const approveHeader = request.headers.get('x-amulets-approve') === 'true'
+  const isApprovedPublicPull = asset.is_public && !!user && approveHeader
+
+  // Private asset: only the owner can access
+  if (!asset.is_public && !isOwner) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
@@ -44,11 +56,23 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
+  // Public asset without owner access or approve header: return metadata only
+  if (!isOwner && !isApprovedPublicPull) {
+    return NextResponse.json({
+      version: av.version,
+      message: av.message,
+      created_at: av.created_at,
+      asset_format: asset.asset_format,
+      review_url: `https://amulets.dev/${owner}/${name}`,
+    })
+  }
+
+  // Owner or approved public pull: return full content
   if (asset.asset_format === 'file') {
     return NextResponse.json({ version: av.version, content: av.content })
   }
 
-  // Package: return a signed download URL (CLI downloads directly from storage)
+  // Package: return a signed download URL
   const { data: signedUrl, error: storageError } = await service.storage
     .from('packages')
     .createSignedUrl(av.storage_path!, 3600)

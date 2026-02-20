@@ -33,6 +33,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_reports: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          reason: string
+          reporter_id: string | null
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          reason: string
+          reporter_id?: string | null
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          reporter_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'asset_reports_asset_id_fkey'
+            columns: ['asset_id']
+            isOneToOne: false
+            referencedRelation: 'assets'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'asset_reports_reporter_id_fkey'
+            columns: ['reporter_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       asset_versions: {
         Row: {
           asset_id: string
@@ -82,6 +121,7 @@ export type Database = {
           fts: unknown
           id: string
           is_public: boolean
+          is_reported: boolean
           name: string
           owner_id: string
           slug: string
@@ -95,6 +135,7 @@ export type Database = {
           fts?: unknown
           id?: string
           is_public?: boolean
+          is_reported?: boolean
           name: string
           owner_id: string
           slug: string
@@ -108,6 +149,7 @@ export type Database = {
           fts?: unknown
           id?: string
           is_public?: boolean
+          is_reported?: boolean
           name?: string
           owner_id?: string
           slug?: string

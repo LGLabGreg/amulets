@@ -63,7 +63,11 @@ export function registerLogin(program: Command): void {
         spinner.text = 'Exchanging token...'
         const tokenResponse = await exchangeCodeForToken(code, codeVerifier, redirectUri)
 
-        writeConfig({ token: tokenResponse.access_token })
+        writeConfig({
+          token: tokenResponse.access_token,
+          refresh_token: tokenResponse.refresh_token,
+          expires_at: Date.now() + tokenResponse.expires_in * 1000,
+        })
         spinner.succeed('Logged in successfully.')
       } catch (err) {
         spinner.fail(`Login failed: ${err instanceof Error ? err.message : String(err)}`)

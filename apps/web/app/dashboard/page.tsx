@@ -1,8 +1,8 @@
-import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { redirect } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceClient } from '@/utils/supabase/service'
 
@@ -111,8 +111,9 @@ export default async function DashboardPage() {
       ) : (
         <div className="border border-border">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_100px_80px_100px_100px] border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="grid grid-cols-[1fr_80px_100px_80px_100px_100px] border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             <span>Name</span>
+            <span>Visibility</span>
             <span>Type</span>
             <span>Format</span>
             <span>Versions</span>
@@ -131,7 +132,7 @@ export default async function DashboardPage() {
             return (
               <div
                 key={asset.id}
-                className={`grid grid-cols-[1fr_100px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b border-border' : ''}`}
+                className={`grid grid-cols-[1fr_80px_100px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b border-border' : ''}`}
               >
                 <div className="min-w-0">
                   <Link
@@ -146,6 +147,14 @@ export default async function DashboardPage() {
                     </p>
                   )}
                 </div>
+                <span>
+                  <Badge
+                    variant={asset.is_public ? 'default' : 'outline'}
+                    className="font-mono text-xs"
+                  >
+                    {asset.is_public ? 'public' : 'private'}
+                  </Badge>
+                </span>
                 <span>
                   <Badge variant="secondary" className="font-mono text-xs">
                     {asset.type}

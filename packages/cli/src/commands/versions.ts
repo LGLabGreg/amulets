@@ -1,6 +1,7 @@
 import type { Command } from 'commander'
 import ora from 'ora'
 import { ApiError, getAssetVersions } from '../lib/api.js'
+import { requireToken } from '../lib/config.js'
 
 export function registerVersions(program: Command): void {
   program
@@ -14,10 +15,11 @@ export function registerVersions(program: Command): void {
       }
       const [owner, name] = parts
 
+      const token = await requireToken()
       const spinner = ora(`Fetching versions for ${ownerName}...`).start()
 
       try {
-        const { versions } = await getAssetVersions(owner, name)
+        const { versions } = await getAssetVersions(owner, name, token)
         spinner.stop()
 
         if (versions.length === 0) {
