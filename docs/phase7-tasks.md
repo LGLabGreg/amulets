@@ -59,6 +59,11 @@ Sources: `docs/review.md` (R) and `docs/public-private-split.md` (P).
 
 - [x] **B12** Require auth on all CLI commands — `pull`, `list`, `versions` all call `requireToken()` (P-C5)
 
+- [x] **B20** Web-app CLI auth — replace direct Supabase PKCE flow with browser redirect to `amulets.dev/cli-auth`; CLI needs no Supabase env vars; tokens returned via localhost callback
+  - New: `apps/web/app/cli-auth/page.tsx`, `apps/web/app/cli-auth/actions.ts`
+  - New: `apps/web/app/api/auth/me/route.ts`, `apps/web/app/api/auth/refresh/route.ts`
+  - Updated: `packages/cli/src/lib/auth.ts`, `packages/cli/src/commands/login.ts`, `packages/cli/src/commands/whoami.ts`, `packages/cli/src/lib/config.ts`
+
 ### B — Web UI
 
 - [x] **B13** `/:owner/:name` — update pull command block: show `amulets pull owner/name --approve` for public assets; add "Copy content" button for simple assets; plain pull for owner's own assets (P-W1)

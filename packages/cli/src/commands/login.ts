@@ -1,16 +1,12 @@
 import { execSync } from 'node:child_process'
 import type { Command } from 'commander'
 import ora from 'ora'
-import {
-  exchangeCodeForToken,
-  findFreePort,
-  generateCodeChallenge,
-  generateCodeVerifier,
-  getSupabaseAnonKey,
-  getSupabaseUrl,
-  waitForOAuthCallback,
-} from '../lib/auth.js'
-import { writeConfig } from '../lib/config.js'
+import { findFreePort, waitForCLIAuthCallback } from '../lib/auth.js'
+import { getApiUrl, writeConfig } from '../lib/config.js'
+
+function isWSL(): boolean {
+  return !!process.env.WSL_DISTRO_NAME || !!process.env.WSLENV
+}
 
 function openBrowser(url: string): void {
   const platform = process.platform
@@ -19,6 +15,8 @@ function openBrowser(url: string): void {
       execSync(`open "${url}"`)
     } else if (platform === 'win32') {
       execSync(`start "" "${url}"`)
+    } else if (isWSL()) {
+      execSync(`cmd.exe /c start "" "${url}"`)
     } else {
       execSync(`xdg-open "${url}"`)
     }
@@ -32,41 +30,28 @@ export function registerLogin(program: Command): void {
     .command('login')
     .description('Authenticate with GitHub via browser')
     .action(async () => {
-      const supabaseUrl = getSupabaseUrl()
-      getSupabaseAnonKey() // validate early
-
+      const apiUrl = getApiUrl()
       const port = await findFreePort()
-      const redirectUri = `http://localhost:${port}/callback`
-      const codeVerifier = generateCodeVerifier()
-      const codeChallenge = generateCodeChallenge(codeVerifier)
-
-      const oauthUrl =
-        `${supabaseUrl}/auth/v1/authorize` +
-        `?provider=github` +
-        `&redirect_to=${encodeURIComponent(redirectUri)}` +
-        `&code_challenge=${codeChallenge}` +
-        `&code_challenge_method=S256`
+      const callbackUrl = `http://localhost:${port}`
+      const loginUrl = `${apiUrl}/cli-auth?callback=${encodeURIComponent(callbackUrl)}`
 
       console.log('Opening browser for GitHub authentication...')
-      openBrowser(oauthUrl)
+      openBrowser(loginUrl)
 
       const spinner = ora('Waiting for authentication...').start()
 
       try {
-        const code = await Promise.race([
-          waitForOAuthCallback(port),
+        const result = await Promise.race([
+          waitForCLIAuthCallback(port),
           new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Login timed out after 5 minutes')), 5 * 60 * 1000),
           ),
         ])
 
-        spinner.text = 'Exchanging token...'
-        const tokenResponse = await exchangeCodeForToken(code, codeVerifier, redirectUri)
-
         writeConfig({
-          token: tokenResponse.access_token,
-          refresh_token: tokenResponse.refresh_token,
-          expires_at: Date.now() + tokenResponse.expires_in * 1000,
+          token: result.token,
+          refresh_token: result.refresh_token,
+          expires_at: Date.now() + result.expires_in * 1000,
         })
         spinner.succeed('Logged in successfully.')
       } catch (err) {

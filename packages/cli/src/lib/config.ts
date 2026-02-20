@@ -1,7 +1,6 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { refreshAccessToken } from './auth.js'
 
 export interface Config {
   token: string
@@ -43,7 +42,7 @@ export function getApiUrl(): string {
   return process.env.AMULETS_API_URL ?? config?.apiUrl ?? 'https://amulets.dev'
 }
 
-// Returns a valid access token, refreshing if it expires within 60 seconds.
+// Returns a valid access token, refreshing via the web app if it expires within 60 seconds.
 export async function getValidToken(): Promise<string> {
   const config = readConfig()
   if (!config?.token) {
@@ -56,18 +55,30 @@ export async function getValidToken(): Promise<string> {
 
   if (needsRefresh && config.refresh_token) {
     try {
-      const refreshed = await refreshAccessToken(config.refresh_token)
-      const updated: Config = {
-        ...config,
-        token: refreshed.access_token,
-        refresh_token: refreshed.refresh_token,
-        expires_at: Date.now() + refreshed.expires_in * 1000,
+      const apiUrl = getApiUrl()
+      const res = await fetch(`${apiUrl}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: config.refresh_token }),
+      })
+
+      if (res.ok) {
+        const refreshed = (await res.json()) as {
+          access_token: string
+          refresh_token: string
+          expires_in: number
+        }
+        const updated: Config = {
+          ...config,
+          token: refreshed.access_token,
+          refresh_token: refreshed.refresh_token,
+          expires_at: Date.now() + refreshed.expires_in * 1000,
+        }
+        writeConfig(updated)
+        return updated.token
       }
-      writeConfig(updated)
-      return updated.token
     } catch {
       // Refresh failed — fall through and try with existing token.
-      // If it's truly expired the API will return 401 and the user can re-login.
     }
   }
 
