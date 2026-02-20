@@ -24,11 +24,11 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-4 py-20">
           <p className="mb-4 font-mono text-sm text-muted-foreground">amulets.dev</p>
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-            npm for AI workflow files
+            Your AI workflows, everywhere
           </h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-            Push, pull, and sync your AI workflow assets across projects. Private by default. Browse
-            public skills and prompts shared by the community.
+            Push, pull, and sync prompts, skills, and rules across every project. Private by
+            default. Share what you want.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">

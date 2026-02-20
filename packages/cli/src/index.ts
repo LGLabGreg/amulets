@@ -12,7 +12,7 @@ const program = new Command()
 
 program
   .name('amulets')
-  .description('Push and pull AI workflow assets from the Amulets registry')
+  .description('Push, pull, and sync AI workflow assets — private by default')
   .version('0.1.0')
 
 registerLogin(program)

@@ -3,7 +3,7 @@
 ## Project Overview
 
 A CLI-first registry for AI workflow assets (prompts, skills, `.cursorrules`, `AGENTS.md`).
-"npm for AI workflow files." Domain: `amulets.dev`
+"Your AI workflows, everywhere." Domain: `amulets.dev`
 
 ## Monorepo Structure
 
