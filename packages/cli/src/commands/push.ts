@@ -25,6 +25,46 @@ async function promptName(suggestion: string): Promise<string> {
   }
 }
 
+async function promptPublicMeta(provided: {
+  description?: string
+  message?: string
+  tags?: string
+}): Promise<{ description?: string; message?: string; tags: string[] }> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  try {
+    let description = provided.description
+    if (description === undefined) {
+      const answer = await rl.question('? Description › ')
+      description = answer.trim() || undefined
+    }
+
+    let message = provided.message
+    if (message === undefined) {
+      const answer = await rl.question('? Version message › ')
+      message = answer.trim() || undefined
+    }
+
+    let tagsRaw = provided.tags
+    if (tagsRaw === undefined) {
+      const answer = await rl.question('? Tags (comma-separated) › ')
+      tagsRaw = answer.trim() || undefined
+    }
+
+    return {
+      description,
+      message,
+      tags: tagsRaw
+        ? tagsRaw
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
+    }
+  } finally {
+    rl.close()
+  }
+}
+
 function toSlug(name: string): string {
   return name
     .toLowerCase()
@@ -151,12 +191,6 @@ export function registerPush(program: Command): void {
         }
 
         const slug = toSlug(name)
-        const tags = options.tags
-          ? options.tags
-              .split(',')
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : []
 
         if (isPublic && format !== 'file') {
           console.error(
@@ -164,6 +198,23 @@ export function registerPush(program: Command): void {
           )
           process.exit(1)
         }
+
+        const publicMeta = isPublic
+          ? await promptPublicMeta({
+              description: options.description,
+              message: options.message,
+              tags: options.tags,
+            })
+          : {
+              description: options.description,
+              message: options.message,
+              tags: options.tags
+                ? options.tags
+                    .split(',')
+                    .map((t) => t.trim())
+                    .filter(Boolean)
+                : [],
+            }
 
         const spinner = ora('Pushing asset...').start()
 
@@ -182,11 +233,11 @@ export function registerPush(program: Command): void {
               JSON.stringify({
                 name,
                 slug,
-                description: options.description,
+                description: publicMeta.description,
                 asset_format: format,
-                tags,
+                tags: publicMeta.tags,
                 version: options.version,
-                message: options.message,
+                message: publicMeta.message,
                 is_public: isPublic,
               }),
             )
@@ -215,10 +266,10 @@ export function registerPush(program: Command): void {
             const result = await pushSimpleAsset(token, {
               name,
               slug,
-              description: options.description,
-              tags,
+              description: publicMeta.description,
+              tags: publicMeta.tags,
               version: options.version,
-              message: options.message,
+              message: publicMeta.message,
               content,
               is_public: isPublic,
             })
