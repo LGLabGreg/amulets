@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createClient } from '@/utils/supabase/server'
 import Logo from './logo'
+import { ThemeToggle } from './theme-toggle'
 import { UserNav } from './user-nav'
 
 export default async function Header() {
@@ -31,9 +32,11 @@ export default async function Header() {
           <form action="/explore" className="hidden md:flex flex-1 max-w-sm">
             <Input name="q" placeholder="Search amulets…" className="h-8" />
           </form>
+
           <Button
             nativeButton={false}
             variant="outline"
+            className="w-8 px-0 md:w-auto md:px-2.5"
             render={
               <Link href="/explore">
                 <Compass />
@@ -41,6 +44,7 @@ export default async function Header() {
               </Link>
             }
           />
+          <ThemeToggle />
 
           {user ? (
             <UserNav username={username} avatarUrl={avatarUrl} />

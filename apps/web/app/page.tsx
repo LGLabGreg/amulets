@@ -1,4 +1,4 @@
-import { Compass } from 'lucide-react'
+import { ChevronRight, Compass } from 'lucide-react'
 import Link from 'next/link'
 import { AssetCard } from '@/components/asset-card'
 import { InstallButton } from '@/components/install-button'
@@ -70,14 +70,17 @@ export default async function Home() {
 
       {/* Recent assets */}
       <section className="mx-auto max-w-6xl px-4 py-6 border-l">
-        <div className="mb-6 flex items-center justify-between border-b pb-3">
+        <div className="mb-6 flex items-center justify-between pb-3">
           <h2 className="font-semibold">Recently published</h2>
-          <Link
-            href="/explore"
-            className="text-xs text-muted-foreground hover:text-foreground font-mono"
-          >
-            View all →
-          </Link>
+          <Button
+            nativeButton={false}
+            variant="outline"
+            render={
+              <Link href="/explore">
+                View all <ChevronRight />
+              </Link>
+            }
+          ></Button>
         </div>
 
         {assets.length === 0 ? (
