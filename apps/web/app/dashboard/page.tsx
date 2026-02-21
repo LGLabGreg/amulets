@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between border-b border-border pb-6">
+      <div className="mb-8 flex items-start justify-between border-b pb-6">
         <div className="flex items-center gap-3">
           {userRecord?.avatar_url && (
             <Image
@@ -51,16 +52,19 @@ export default async function DashboardPage() {
             <h1 className="text-xl font-bold tracking-tight">
               {userRecord?.username ?? user.email}
             </h1>
-            <p className="text-sm text-muted-foreground">Your assets</p>
+            <p className="text-sm text-muted-foreground">Your amulets</p>
           </div>
         </div>
         <Link href="/new">
-          <Button size="sm">+ New asset</Button>
+          <Button size="sm">
+            <Plus />
+            New amulet
+          </Button>
         </Link>
       </div>
 
       {/* Stats row */}
-      <div className="mb-8 grid grid-cols-2 sm:grid-cols-4 border border-border divide-x divide-border">
+      <div className="mb-8 grid grid-cols-2 sm:grid-cols-4 border divide-x divide-border">
         <div className="px-4 py-3">
           <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
             Total
@@ -95,7 +99,7 @@ export default async function DashboardPage() {
 
       {/* Asset table */}
       {assets.length === 0 ? (
-        <div className="border border-border py-20 text-center">
+        <div className="border py-20 text-center">
           <p className="text-sm text-muted-foreground">No assets yet.</p>
           <p className="mt-2 text-xs text-muted-foreground">
             Push your first asset from the CLI or{' '}
@@ -104,14 +108,14 @@ export default async function DashboardPage() {
             </Link>
             .
           </p>
-          <div className="mt-6 inline-block border border-border bg-muted/30 px-4 py-3 text-left">
+          <div className="mt-6 inline-block border bg-muted/30 px-4 py-3 text-left">
             <pre className="font-mono text-sm">amulets push ./my-prompt.md</pre>
           </div>
         </div>
       ) : (
-        <div className="border border-border">
+        <div className="border">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_80px_100px_80px_100px_100px] border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="grid grid-cols-[1fr_80px_100px_80px_100px_100px] border-b bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             <span>Name</span>
             <span>Visibility</span>
             <span>Type</span>
@@ -132,7 +136,7 @@ export default async function DashboardPage() {
             return (
               <div
                 key={asset.id}
-                className={`grid grid-cols-[1fr_80px_100px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b border-border' : ''}`}
+                className={`grid grid-cols-[1fr_80px_100px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b' : ''}`}
               >
                 <div className="min-w-0">
                   <Link

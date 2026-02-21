@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { MarkdownContent } from '@/components/markdown-content'
+import { notFound } from 'next/navigation'
 import { FileTree } from '@/components/file-tree'
+import { MarkdownContent } from '@/components/markdown-content'
+import { Badge } from '@/components/ui/badge'
 import { createServiceClient } from '@/utils/supabase/service'
 
 interface FileEntry {
@@ -81,7 +81,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
         <span className="text-foreground">{av.version}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0 lg:divide-x divide-border border border-border">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0 lg:divide-x divide-border border">
         {/* Main */}
         <div className="p-6">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -94,7 +94,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
                 <p className="mt-1 text-sm text-muted-foreground">{asset.description}</p>
               )}
             </div>
-            <span className="font-mono text-sm border border-border px-2 py-0.5 text-muted-foreground">
+            <span className="font-mono text-sm border px-2 py-0.5 text-muted-foreground">
               v{av.version}
             </span>
           </div>
@@ -115,7 +115,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
           </div>
 
           {/* Pull command for this version */}
-          <div className="mb-8 border border-border bg-muted/30 px-4 py-3">
+          <div className="mb-8 border bg-muted/30 px-4 py-3">
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Pull this version
             </p>
@@ -126,7 +126,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
 
           {/* Content */}
           <div>
-            <div className="mb-3 border-b border-border pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               {asset.asset_format === 'package' ? 'Files' : 'Content'}
             </div>
 
@@ -141,7 +141,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
         </div>
 
         {/* Sidebar */}
-        <div className="border-t lg:border-t-0 border-border p-5 space-y-6">
+        <div className="border-t lg:border-t-0 p-5 space-y-6">
           <div>
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               All versions

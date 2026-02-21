@@ -14,7 +14,7 @@ Skill packages add another layer of complexity: a skill isn't just a single file
 
 ## The Solution
 
-A CLI-first registry where developers push markdown assets and skill packages, version them, organise them into collections, and pull them into any project with a single command. Like npm for AI workflow files.
+A CLI-first registry where developers push markdown assets and skill packages, version them, organise them into collections, and pull them into any project with a single command.
 
 ```bash
 # Push a single file asset

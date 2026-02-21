@@ -23,10 +23,7 @@ export function AssetCard({
   const href = `/${owner?.username ?? '_'}/${slug}`
 
   return (
-    <Link
-      href={href}
-      className="group block border border-border p-4 hover:bg-muted/40 transition-colors"
-    >
+    <Link href={href} className="group block border p-4 hover:bg-muted/40 transition-colors">
       <div className="flex items-start justify-between gap-2">
         <span className="font-mono text-sm font-semibold text-foreground group-hover:underline truncate">
           {owner?.username}/{slug}

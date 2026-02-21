@@ -54,7 +54,7 @@ export default async function CliAuthPage({
       <form action={signInWithGitHubForCLI.bind(null, callback)}>
         <button
           type="submit"
-          className="inline-flex items-center gap-2 border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+          className="inline-flex items-center gap-2 border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
         >
           Continue with GitHub
         </button>

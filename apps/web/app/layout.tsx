@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Amulets — npm for AI workflow files',
+  title: 'Amulets — Your AI workflows, everywhere',
   description: 'A registry for AI workflow assets: prompts, skills, cursorrules, and more.',
 }
 

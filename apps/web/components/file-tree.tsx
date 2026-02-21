@@ -26,8 +26,8 @@ export function FileTree({ manifest }: FileTreeProps) {
   }
 
   return (
-    <div className="font-mono text-xs border border-border">
-      <div className="border-b border-border bg-muted/50 px-3 py-2 text-muted-foreground">
+    <div className="font-mono text-xs border">
+      <div className="border-b bg-muted/50 px-3 py-2 text-muted-foreground">
         {manifest.length} file{manifest.length !== 1 ? 's' : ''}
       </div>
       <ul>
@@ -39,7 +39,7 @@ export function FileTree({ manifest }: FileTreeProps) {
           return (
             <li
               key={entry.path}
-              className={`flex items-center justify-between px-3 py-1.5 ${!isLast ? 'border-b border-border' : ''} hover:bg-muted/30`}
+              className={`flex items-center justify-between px-3 py-1.5 ${!isLast ? 'border-b' : ''} hover:bg-muted/30`}
             >
               <span
                 style={{ paddingLeft: `${depth * 16}px` }}

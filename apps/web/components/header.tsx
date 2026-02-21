@@ -17,7 +17,7 @@ export default async function Header() {
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined
 
   return (
-    <header className="border-b border-border bg-background">
+    <header className="border-b bg-background">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
         <Link
           href="/"

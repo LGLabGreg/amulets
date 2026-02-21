@@ -78,9 +78,9 @@ export function NewAssetForm({ username }: { username: string }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-0 border border-border">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-0 border">
         {/* Name */}
-        <div className="border-b border-border p-4">
+        <div className="border-b p-4">
           <FormField
             control={form.control}
             name="name"
@@ -105,7 +105,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Description */}
-        <div className="border-b border-border p-4">
+        <div className="border-b p-4">
           <FormField
             control={form.control}
             name="description"
@@ -122,7 +122,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Type + Version row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border border-b border-border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border border-b">
           <div className="p-4">
             <FormField
               control={form.control}
@@ -167,7 +167,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Release notes */}
-        <div className="border-b border-border p-4">
+        <div className="border-b p-4">
           <FormField
             control={form.control}
             name="message"
@@ -184,7 +184,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Content */}
-        <div className="border-b border-border p-4">
+        <div className="border-b p-4">
           <FormField
             control={form.control}
             name="content"
@@ -208,7 +208,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Visibility toggle */}
-        <div className="border-b border-border p-4">
+        <div className="border-b p-4">
           <FormField
             control={form.control}
             name="is_public"
@@ -236,7 +236,7 @@ export function NewAssetForm({ username }: { username: string }) {
         </div>
 
         {/* Package note */}
-        <div className="border-b border-border bg-muted/30 px-4 py-3">
+        <div className="border-b bg-muted/30 px-4 py-3">
           <p className="text-xs text-muted-foreground">
             <span className="font-semibold">Pushing a skill package?</span> Use the CLI:{' '}
             <span className="font-mono">amulets push ./my-skill-folder</span>

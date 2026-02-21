@@ -39,7 +39,7 @@ export function ReportButton({ owner, name }: { owner: string; name: string }) {
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="Why are you reporting this asset?"
-        className="w-full border border-border bg-background px-3 py-2 text-sm"
+        className="w-full border bg-background px-3 py-2 text-sm"
         rows={3}
       />
       <div className="flex gap-2">

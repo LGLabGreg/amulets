@@ -1,5 +1,7 @@
+import { Compass } from 'lucide-react'
 import Link from 'next/link'
 import { AssetCard } from '@/components/asset-card'
+import { InstallButton } from '@/components/install-button'
 import { Button } from '@/components/ui/button'
 import { createServiceClient } from '@/utils/supabase/service'
 
@@ -20,9 +22,8 @@ export default async function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <p className="mb-4 font-mono text-sm text-muted-foreground">amulets.dev</p>
+      <section className="border-b">
+        <div className="mx-auto max-w-6xl px-4 py-16 border-l">
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
             Your AI workflows, everywhere
           </h1>
@@ -33,56 +34,44 @@ export default async function Home() {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/explore">
-              <Button size="sm">Browse registry</Button>
-            </Link>
-            <a
-              href="https://www.npmjs.com/package/amulets-cli"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="outline" size="sm" className="font-mono">
-                npm install -g amulets-cli
+              <Button size="sm">
+                <Compass />
+                Explore amulets
               </Button>
-            </a>
+            </Link>
+
+            <InstallButton />
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            One command away
-          </h2>
-          <div className="grid gap-0 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
-            <div className="py-4 sm:py-0 sm:px-6 first:pl-0 last:pr-0">
-              <p className="mb-2 font-semibold">Push an asset</p>
-              <pre className="font-mono text-sm text-muted-foreground">
-                amulets push ./my-prompt.md
-              </pre>
-            </div>
-            <div className="py-4 sm:py-0 sm:px-6">
-              <p className="mb-2 font-semibold">Pull your asset</p>
-              <pre className="font-mono text-sm text-muted-foreground">
-                amulets pull myuser/my-prompt
-              </pre>
-            </div>
-            <div className="py-4 sm:py-0 sm:px-6 last:pr-0">
-              <p className="mb-2 font-semibold">Pull a public asset</p>
-              <pre className="font-mono text-sm text-muted-foreground">
-                amulets pull dev/skill --approve
-              </pre>
-            </div>
+      <section className="border-b">
+        <div className="mx-auto max-w-6xl border-l">
+          <div className="grid gap-0 sm:grid-cols-3">
+            {[
+              {
+                label: 'Push an asset',
+                command: 'amulets push AGENTS.md --name agents',
+              },
+              { label: 'Pull your asset', command: 'amulets pull agents' },
+              {
+                label: 'Pull a public asset',
+                command: 'amulets pull dev/skill --approve',
+              },
+            ].map(({ label, command }) => (
+              <div key={label} className="border-r  px-4 py-6">
+                <p className="mb-2 font-semibold">{label}</p>
+                <pre className="font-mono text-xs bg-muted/70 w-fit py-2 px-3">{command}</pre>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Recent assets */}
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="mb-6 flex items-center justify-between border-b border-border pb-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Recently published
-          </h2>
+      <section className="mx-auto max-w-6xl px-4 py-6 border-l">
+        <div className="mb-6 flex items-center justify-between border-b pb-3">
+          <h2 className="font-semibold">Recently published</h2>
           <Link
             href="/explore"
             className="text-xs text-muted-foreground hover:text-foreground font-mono"
@@ -94,9 +83,12 @@ export default async function Home() {
         {assets.length === 0 ? (
           <p className="text-sm text-muted-foreground">No assets yet. Be the first to push one.</p>
         ) : (
-          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border">
+          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4 border divide-y sm:divide-y-0 sm:divide-x divide-border">
             {assets.map((asset) => {
-              const versions = asset.asset_versions as { version: string; created_at: string }[]
+              const versions = asset.asset_versions as {
+                version: string
+                created_at: string
+              }[]
               const latest = versions?.[0]?.version ?? null
               return (
                 <AssetCard
@@ -106,7 +98,12 @@ export default async function Home() {
                   type={asset.type ?? 'other'}
                   asset_format={asset.asset_format}
                   tags={asset.tags ?? []}
-                  owner={asset.users as { username: string; avatar_url: string | null }}
+                  owner={
+                    asset.users as {
+                      username: string
+                      avatar_url: string | null
+                    }
+                  }
                   latestVersion={latest}
                 />
               )
@@ -116,17 +113,15 @@ export default async function Home() {
       </section>
 
       {/* Install strip */}
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto max-w-6xl px-4 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <section className="border-t bg-muted/30">
+        <div className="mx-auto max-w-6xl px-4 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-l">
           <div>
-            <p className="font-semibold">Get started in seconds</p>
+            <h2 className="font-semibold">Get started in seconds</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Install the CLI, authenticate with GitHub, and start sharing.
             </p>
           </div>
-          <pre className="font-mono text-sm bg-background border border-border px-4 py-2 shrink-0">
-            npm install -g amulets-cli
-          </pre>
+          <InstallButton />
         </div>
       </section>
     </div>

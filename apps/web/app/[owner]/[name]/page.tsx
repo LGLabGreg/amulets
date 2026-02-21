@@ -37,7 +37,10 @@ async function getAsset(owner: string, name: string) {
     )
     .eq('owner_id', userRecord.id)
     .eq('slug', name)
-    .order('created_at', { referencedTable: 'asset_versions', ascending: false })
+    .order('created_at', {
+      referencedTable: 'asset_versions',
+      ascending: false,
+    })
     .single()
 
   if (!asset) return null
@@ -90,7 +93,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
         <span className="text-foreground">{name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0 lg:divide-x divide-border border border-border">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0 lg:divide-x divide-border border">
         {/* Main content */}
         <div className="p-6">
           {/* Title row */}
@@ -104,7 +107,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
               )}
             </div>
             {latest && (
-              <span className="font-mono text-sm text-muted-foreground border border-border px-2 py-0.5">
+              <span className="font-mono text-sm text-muted-foreground border px-2 py-0.5">
                 v{latest.version}
               </span>
             )}
@@ -129,7 +132,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
           </div>
 
           {/* Pull command */}
-          <div className="mb-4 border border-border bg-muted/30 px-4 py-3">
+          <div className="mb-4 border bg-muted/30 px-4 py-3">
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Pull via CLI
             </p>
@@ -142,7 +145,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
 
           {/* Copy content button — only for public simple assets */}
           {asset.is_public && asset.asset_format === 'file' && latest?.content && (
-            <div className="mb-8 border border-border bg-muted/30 px-4 py-3 flex items-center justify-between">
+            <div className="mb-8 border bg-muted/30 px-4 py-3 flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Copy content
               </p>
@@ -152,7 +155,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
 
           {/* Content */}
           <div>
-            <div className="mb-3 border-b border-border pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               {asset.asset_format === 'package' ? 'Files' : 'Content'}
             </div>
 
@@ -167,7 +170,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
         </div>
 
         {/* Sidebar */}
-        <div className="border-t lg:border-t-0 border-border p-5 space-y-6">
+        <div className="border-t lg:border-t-0 p-5 space-y-6">
           {/* Owner */}
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -204,7 +207,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Version history
               </p>
-              <ul className="border border-border divide-y divide-border">
+              <ul className="border divide-y divide-border">
                 {versions.map((v) => (
                   <li key={v.id}>
                     <Link
