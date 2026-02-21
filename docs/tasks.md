@@ -16,10 +16,10 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 ---
 
-## Phase 1 — Infrastructure (manual setup, you do these)
+## Phase 1 — Infrastructure
 
 - [x] **T06** Create Supabase project → copy `SUPABASE_URL`, `ANON_KEY`, `SERVICE_ROLE_KEY` into `apps/web/.env.local`
-- [x] **T07** Create GitHub OAuth App (Settings → Developer Settings → OAuth Apps) → copy `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` into Supabase Auth dashboard
+- [x] **T07** Create GitHub OAuth App → copy `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` into Supabase Auth dashboard
 - [x] **T08** Create Supabase Storage bucket named `packages` (public bucket, for skill package zips)
 
 ---
@@ -31,14 +31,14 @@ Tasks are worked through in order within each phase. Check off items as complete
 - [x] **T11** Migration: `asset_versions` table + RLS
 - [x] **T12** Migration: `collections` + `collection_items` tables + RLS
 - [x] **T13** Migration: DB indexes (owner slug lookups, search on name/description)
-- [x] **T14** Apply migrations to Supabase project (via Supabase CLI or dashboard)
+- [x] **T14** Apply migrations to Supabase project
 
 ---
 
 ## Phase 3 — Web App Foundation
 
 - [x] **T15** Scaffold `apps/web` as Next.js 15 app (App Router, TypeScript, Tailwind)
-- [x] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog) — added via `shadcn add`
+- [x] **T16** Install and configure Shadcn/ui (base components: Button, Input, Badge, Card, Dialog)
 - [x] **T17** Set up Supabase client helpers (`utils/supabase/server.ts`, `utils/supabase/client.ts`, `utils/supabase/middleware.ts`)
 - [x] **T18** Auth middleware: protect `/dashboard` and `/new` routes, handle session refresh
 - [x] **T19** Base layout: header (logo, search bar, login/logout, avatar), footer
@@ -49,7 +49,7 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 - [x] **T20** `POST /api/assets` — push simple asset (text content, create asset + version)
 - [x] **T21** `POST /api/assets` — push skill package (multipart zip upload → Supabase Storage, store `file_manifest`)
-- [x] **T22** `GET /api/assets/search` — full-text search on name + description, filter by type/tags/format
+- [x] **T22** `GET /api/assets/search` — full-text search on name + description, filter by tags/format
 - [x] **T23** `GET /api/assets/:owner/:name` — asset metadata + latest version info
 - [x] **T24** `GET /api/assets/:owner/:name/versions` — list all versions
 - [x] **T25** `GET /api/assets/:owner/:name/:version` — return text content (simple) or signed storage URL (package)
@@ -61,70 +61,138 @@ Tasks are worked through in order within each phase. Check off items as complete
 ## Phase 5 — CLI
 
 - [x] **T28** Scaffold `packages/cli`: `package.json`, `tsconfig.json`, Commander.js entry point, build script
-- [x] **T29** `amulet login` — open browser to Supabase GitHub OAuth URL, listen on localhost callback, save token to `~/.config/amulet/config.json`
-- [x] **T30** `amulet logout` / `amulet whoami`
-- [x] **T31** `amulet push <file>` — push simple asset (read file, POST to API)
-- [x] **T32** `amulet push <folder>` — push skill package (detect `SKILL.md`, zip folder, multipart POST)
-- [x] **T33** `amulet pull <owner/name>` (simple asset) — fetch text content, write to file
-- [x] **T34** `amulet pull <owner/name>` (skill package) — fetch signed URL, download zip, unzip to `--output` dir
-- [x] **T35** `amulet list` — list your assets (calls `GET /api/me/assets`)
-- [x] **T36** `amulet search <query>` — search public registry
-- [x] **T37** `amulet versions <owner/name>` — list versions of an asset
-- [x] **T38** npm publish setup (`prepublishOnly` build, `bin` field, `files` array)
+- [x] **T29** `amulets login` — browser redirect to `amulets.dev/cli-auth`, listen on localhost callback, save token
+- [x] **T30** `amulets logout` / `amulets whoami`
+- [x] **T31** `amulets push <file>` — push simple asset (read file, POST to API)
+- [x] **T32** `amulets push <folder>` — detect format (`skill` if `SKILL.md` present, else `bundle`), zip, multipart POST
+- [x] **T33** `amulets pull <owner/name>` (simple asset) — fetch text content, write to file
+- [x] **T34** `amulets pull <owner/name>` (skill/bundle) — fetch signed URL, download zip, unzip to `--output` dir
+- [x] **T35** `amulets list` — list your assets (calls `GET /api/me/assets`)
+- [x] **T36** `amulets versions <owner/name>` — list versions of an asset
+- [x] **T37** npm publish setup (`prepublishOnly` build, `bin` field, `files` array)
 
 ---
 
 ## Phase 6 — Web UI (MVP pages)
 
-- [x] **T39** `/` Landing page: hero text, search bar, featured/recent assets
-- [x] **T40** `/explore` page: browse public assets, filter by type/tag/format, paginated
-- [x] **T41** `/:owner/:name` asset detail page — simple asset: render `SKILL.md` / markdown content with Shiki
-- [x] **T42** `/:owner/:name` asset detail page — skill package: render `SKILL.md` + file tree from `file_manifest`
-- [x] **T43** `/:owner/:name/:version` — version detail with diff vs previous (simple asset: text diff; package: file tree diff)
-- [x] **T44** `/dashboard` — list your assets + collections (authed)
-- [x] **T45** `/new` — push asset via web form (text input for simple assets, zip upload for packages)
+- [x] **T38** `/` Landing page: hero text, featured/recent assets, CLI command examples
+- [x] **T39** `/explore` page: browse public assets, filter by tag/format, paginated
+- [x] **T40** `/:owner/:name` asset detail page — file: render markdown content with Shiki
+- [x] **T41** `/:owner/:name` asset detail page — skill/bundle: render `SKILL.md` + file tree from `file_manifest`
+- [x] **T42** `/:owner/:name/:version` — version detail with diff vs previous
+- [x] **T43** `/dashboard` — list your assets + collections (authed)
+- [x] **T44** `/new` — push asset via web form (text input for simple assets)
 
 ---
 
-## Phase 7 — Deploy & End-to-End Test
+## Phase 7 — Pre-Deploy Hardening
 
-- [ ] **T46** Deploy `apps/web` to Vercel (connect repo, add env vars)
-- [ ] **T47** Publish `amulet-cli` to npm (check name availability first)
-- [ ] **T48** End-to-end smoke test: `amulet login` → `amulet push` a real skill package → `amulet pull` it into a fresh directory → verify file structure
+### 7A — Critical Bug Fixes
+
+- [x] **A1** Fix ESM `require()` in CLI pull.ts — replace with top-level `import { Readable } from 'node:stream'`
+- [x] **A2** Add `fts` generated column migration — stored tsvector column with GIN index, drop redundant computed index
+- [x] **A3** CLI token refresh — store `refresh_token` + `expires_at` on login; `getValidToken()` refreshes before API calls
+- [x] **A4** Reserve `"latest"` as a version string — validate in push endpoint and return 400
+- [x] **A5** Add file size guard on package uploads — reject zips > 4MB with 413 before reading into memory
+
+### 7B — Asset Format Refactor (`file | skill | bundle`)
+
+- [x] **R1** Migration: rename `package`→`skill`, add `bundle` to check constraint, drop `type` column
+- [x] **R2** Update TypeScript types: `asset_format: 'file' | 'skill' | 'bundle'`, remove `type` field everywhere
+- [x] **R3** CLI `push.ts`: replace `isSkillPackage` with `detectFormat()`, remove `--type` flag, send `asset_format` in payload
+- [x] **R4** API push route: accept `asset_format` from CLI, remove `VALID_TYPES` enum and `type` field from upsert
+- [x] **R5** Web UI: update AssetCard, ExploreFilters, Explore page, asset detail pages, dashboard, homepage, `/new` form — remove all `type` references, fix format checks
+
+### 7C — Public/Private Architecture
+
+- [x] **B1** Migration: set `is_public` default to `false`
+- [x] **B2** Migration: add `is_reported boolean DEFAULT false` to assets; create `asset_reports` table + RLS policies
+- [x] **B3** Migration: update `assets_select` RLS policy to exclude reported assets
+- [x] **B4** `POST /api/assets` — accept and persist `is_public` from request body (default `false`)
+- [x] **B5** `GET /api/assets/:owner/:name/:version` — return metadata-only for public assets without `x-amulets-approve: true` header; owners always get full content
+- [x] **B6** `POST /api/assets/:owner/:name/report` — new report endpoint; inserts into `asset_reports`, sets `is_reported = true`
+- [x] **B7** `GET /api/assets/search` — add `is_reported: false` filter
+- [x] **B8** Remove CLI `search` command — discovery happens on the website
+- [x] **B9** CLI `pull` — add `--approve` flag; send `x-amulets-approve: true` header; if server returns `review_url` without content, print guidance and exit 1
+- [x] **B10** CLI `push` — add `--public` flag; include `is_public` in push payload; show `public`/`private` in success message
+- [x] **B11** CLI `api.ts` — update `getAssetVersion` to accept token + extra headers; add `is_public` to push payloads; remove `searchAssets` export
+- [x] **B12** Require auth on all CLI commands — `pull`, `list`, `versions` all call `requireToken()`
+- [x] **B13** `/:owner/:name` — update pull command block to show `--approve` for public assets; add "Copy content" button for simple assets
+- [x] **B14** `/:owner/:name` — add `<ReportButton>` client component (visible to logged-in non-owners on public assets)
+- [x] **B15** `/new` — add "Make this asset public" checkbox; pass `is_public` through `createAssetAction`
+- [x] **B16** Landing page — update hero copy and "how it works" examples to reflect private-first + `--approve` pattern
+- [x] **B17** Explore page — rename header to "Public Assets", add `--approve` note, add `is_reported: false` filter
+- [x] **B18** Dashboard — add public/private badge to each asset row
+- [x] **B19** Web-app CLI auth — replace direct Supabase PKCE flow with browser redirect to `amulets.dev/cli-auth`; add `/api/auth/me` and `/api/auth/refresh` routes; CLI needs no Supabase env vars
 
 ---
 
-## Phase 8 — Collections
+## Phase 8 — Deploy & End-to-End Test
 
-- [ ] **T49** `POST /api/collections` — create collection
-- [ ] **T50** `GET /api/collections/:owner/:name` — collection detail + items
-- [ ] **T51** `POST /api/collections/:owner/:name/items` — add asset to collection
-- [ ] **T52** `DELETE /api/collections/:owner/:name/items/:id` — remove item
-- [ ] **T53** CLI: `amulet collection create <name>`
-- [ ] **T54** CLI: `amulet collection add <name> <owner/asset>[@version]`
-- [ ] **T55** CLI: `amulet collection pull <name> --output ./`
-- [ ] **T56** CLI: `amulet init` (create `.amuletrc`) + `amulet sync` (pull all assets in `.amuletrc`)
-- [ ] **T57** Web UI: `/collections/:owner/:name` collection detail page
+- [ ] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
+- [ ] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
+- [ ] **C3** End-to-end smoke test: login → push private → pull → push public → pull without `--approve` (expect guidance) → pull with `--approve` → verify file structure
 
 ---
 
-## Phase 9 — Polish & Growth Features
+## Phase 9 — Post-Deploy Improvements
 
-- [ ] **T58** CLI: `amulet inspect <owner/name>` — print file tree of a package without pulling
-- [ ] **T59** CLI: `amulet diff <owner/name> <v1> <v2>` — diff two versions
-- [ ] **T60** Web UI: `/:owner` user profile page (their public assets + collections)
-- [ ] **T61** Web UI: version diff view (unified diff for text, file tree diff for packages)
-- [ ] **T62** Search improvements: tag filter chips, format filter, type filter in `/explore`
-- [ ] **T63** Seed registry with high-quality skill packages (docx, pdf, pptx, xlsx)
+### 9A — CLI
+
+- [ ] **D1** Make `--name` optional on push — default to filename (minus extension) or folder name
+- [ ] **D3** Auto-extract description from YAML frontmatter or first paragraph of markdown on push
+
+### 9B — Web UI
+
+- [ ] **D2** Add zip upload path to `/new` form for skill/bundle packages
+- [ ] **D4** Explore page: add cursor-based pagination (currently limited to 50)
+- [ ] **D5** Dashboard: render collections section (API exists, UI missing)
+
+### 9C — API & Database
+
+- [ ] **D6** Version list: sort by parsed semver rather than `created_at`
+- [ ] **D7** Add `updated_at` column to `assets`, updated on each version push
+- [ ] **D9** Add rate limiting on push endpoint (Vercel rate limiting or per-user throttle)
+- [ ] **D10** Add user record existence check on `GET /api/me/assets` and `GET /api/me/collections`
+
+### 9D — Docs & Config
+
+- [ ] **D8** Align CLI config path — verify actual path in `config.ts`, update CLAUDE.md and README
+- [ ] **E1** README — update examples to show `--public` on push, `--approve` on pull, private-first framing
+- [ ] **E2** CLAUDE.md — add public/private architecture section
+- [ ] **E3** `docs/project-outline.md` — update MVP scope to reflect private-by-default, `--approve` flow, report mechanism
 
 ---
 
-## Backlog (Phase 4+)
+## Phase 10 — Collections
 
-- Private assets (auth-gated)
+- [ ] **T45** `POST /api/collections` — create collection
+- [ ] **T46** `GET /api/collections/:owner/:name` — collection detail + items
+- [ ] **T47** `POST /api/collections/:owner/:name/items` — add asset to collection
+- [ ] **T48** `DELETE /api/collections/:owner/:name/items/:id` — remove item
+- [ ] **T49** CLI: `amulets collection create <name>`
+- [ ] **T50** CLI: `amulets collection add <name> <owner/asset>[@version]`
+- [ ] **T51** CLI: `amulets collection pull <name> --output ./`
+- [ ] **T52** CLI: `amulets init` (create `.amuletrc`) + `amulets sync` (pull all assets in `.amuletrc`)
+- [ ] **T53** Web UI: `/collections/:owner/:name` collection detail page
+
+---
+
+## Phase 11 — Polish & Growth Features
+
+- [ ] **T54** CLI: `amulets inspect <owner/name>` — print file tree of a package without pulling
+- [ ] **T55** CLI: `amulets diff <owner/name> <v1> <v2>` — diff two versions
+- [ ] **T56** Web UI: `/:owner` user profile page (their public assets + collections)
+- [ ] **T57** Web UI: version diff view (unified diff for text, file tree diff for packages)
+- [ ] **T58** Seed registry with high-quality skill packages (docx, pdf, pptx, xlsx)
+
+---
+
+## Backlog
+
 - Asset ratings (thumbs up)
 - Web editor for simple assets
 - VS Code extension
-- Claude Code MCP server for pulling amulet assets from agent context
+- Claude Code MCP server for pulling amulets assets from agent context
 - Asset dependencies
-- GitHub Action: `amulet sync` on PR
+- GitHub Action: `amulets sync` on PR
