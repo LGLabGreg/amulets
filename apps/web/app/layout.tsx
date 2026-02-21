@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${geistMono.variable} font-sans antialiased min-h-screen flex flex-col`}
+        className={`${inter.variable} ${geistMono.variable} font-sans antialiased min-h-screen flex flex-col pt-14`}
       >
         <ThemeProvider>
           <Header />

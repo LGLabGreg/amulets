@@ -1,5 +1,6 @@
 import { ChevronRight, Compass } from 'lucide-react'
 import Link from 'next/link'
+import { Container } from '@/components/container'
 
 const PUSH_FLAGS = [
   { flag: '-n, --name <name>', desc: 'Asset name', required: true },
@@ -47,7 +48,7 @@ export default async function Home() {
     <div>
       {/* Hero */}
       <section className="border-b">
-        <div className="mx-auto max-w-6xl px-4 py-16 border-x">
+        <Container className="py-16 border-x">
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
             Your AI workflows, everywhere
           </h1>
@@ -66,11 +67,11 @@ export default async function Home() {
 
             <InstallButton />
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="border-b">
-        <div className="mx-auto max-w-6xl border-x">
+        <Container className="p-0 border-x">
           <div className="grid gap-0 sm:grid-cols-3">
             {[
               {
@@ -91,11 +92,11 @@ export default async function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* Recent assets */}
-      <section className="mx-auto max-w-6xl px-4 py-6 border-x">
+      <Container className="py-6 border-x">
         <div className="mb-6 flex items-center justify-between pb-3">
           <h2 className="font-semibold">Recently published</h2>
           <Button
@@ -138,11 +139,11 @@ export default async function Home() {
             })}
           </div>
         )}
-      </section>
+      </Container>
 
       {/* Install strip */}
       <section className="border-t bg-muted/30">
-        <div className="mx-auto max-w-6xl px-4 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-x">
+        <Container className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-x">
           <div>
             <h2 className="font-semibold">Get started in seconds</h2>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -150,12 +151,12 @@ export default async function Home() {
             </p>
           </div>
           <InstallButton />
-        </div>
+        </Container>
       </section>
 
       {/* CLI Reference */}
       <section className="border-t">
-        <div className="mx-auto max-w-6xl border-x">
+        <Container className="p-0 border-x">
           {/* push + pull */}
           <div className="grid grid-cols-1 lg:grid-cols-2 border-b divide-y lg:divide-y-0 lg:divide-x">
             {(
@@ -215,7 +216,7 @@ export default async function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
     </div>
   )

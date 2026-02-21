@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
 import { FileTree } from '@/components/file-tree'
 import { MarkdownContent } from '@/components/markdown-content'
@@ -79,7 +80,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
   const showReportButton = asset.is_public && !!user && !isOwner
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <Container>
       {/* Breadcrumb */}
       <nav className="mb-6 text-xs text-muted-foreground font-mono flex items-center gap-1">
         <Link href="/explore" className="hover:text-foreground">
@@ -247,6 +248,6 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
           )}
         </div>
       </div>
-    </div>
+    </Container>
   )
 }

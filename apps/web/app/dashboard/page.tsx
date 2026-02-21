@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Container } from '@/components/container'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/server'
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
   const assets = await getUserAssets(user.id)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <Container>
       {/* Header */}
       <div className="mb-8 flex items-start justify-between border-b pb-6">
         <div className="flex items-center gap-3">
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
         <Link href="/new">
           <Button size="sm">
             <Plus />
-            New amulet
+            Add asset
           </Button>
         </Link>
       </div>
@@ -175,6 +176,6 @@ export default async function DashboardPage() {
           })}
         </div>
       )}
-    </div>
+    </Container>
   )
 }

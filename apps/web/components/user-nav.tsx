@@ -47,7 +47,7 @@ export function UserNav({ username, avatarUrl }: UserNavProps) {
             render={
               <Link href="/new">
                 <Plus />
-                New amulet
+                Add asset
               </Link>
             }
           />

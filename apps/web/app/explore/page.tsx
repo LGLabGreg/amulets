@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { AssetCard } from '@/components/asset-card'
+import { Container } from '@/components/container'
 import { ExploreFilters } from '@/components/explore-filters'
 import { createServiceClient } from '@/utils/supabase/service'
 
@@ -38,7 +39,7 @@ export default async function ExplorePage({
   const assets = await searchAssets(params)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <Container>
       {/* Header */}
       <div className="mb-8 border-b pb-6">
         <h1 className="text-2xl font-bold tracking-tight">Public Amulets</h1>
@@ -111,6 +112,6 @@ export default async function ExplorePage({
           })}
         </div>
       )}
-    </div>
+    </Container>
   )
 }

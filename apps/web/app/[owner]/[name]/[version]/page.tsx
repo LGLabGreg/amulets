@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Container } from '@/components/container'
 import { FileTree } from '@/components/file-tree'
 import { MarkdownContent } from '@/components/markdown-content'
 import { Badge } from '@/components/ui/badge'
@@ -63,7 +64,7 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
   const { asset, version: av } = result
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <Container>
       {/* Breadcrumb */}
       <nav className="mb-6 text-xs text-muted-foreground font-mono flex items-center gap-1">
         <Link href="/explore" className="hover:text-foreground">
@@ -195,6 +196,6 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   )
 }
