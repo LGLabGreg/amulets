@@ -81,7 +81,7 @@ export default async function Home() {
               { label: 'Pull your asset', command: 'amulets pull agents' },
               {
                 label: 'Pull a public asset',
-                command: 'amulets pull dev/skill --approve',
+                command: 'amulets pull owner/skill --approve',
               },
             ].map(({ label, command }) => (
               <div key={label} className="border-r last:border-r-0 px-4 py-6">
