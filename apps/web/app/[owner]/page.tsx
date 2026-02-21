@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { AssetCard } from '@/components/asset-card'
+import { AssetGrid } from '@/components/asset-grid'
 import { Container } from '@/components/container'
 import { createServiceClient } from '@/utils/supabase/service'
 
@@ -69,33 +69,11 @@ export default async function OwnerPage({ params }: { params: Promise<PageParams
       </div>
 
       {/* Asset grid */}
-      {assets.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No public assets yet.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {assets.map((asset) => {
-            const versions = asset.asset_versions as {
-              version: string
-              created_at: string
-            }[]
-            const latest = versions?.sort(
-              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-            )[0]
-
-            return (
-              <AssetCard
-                key={asset.id}
-                slug={asset.slug}
-                description={asset.description}
-                asset_format={asset.asset_format}
-                tags={asset.tags ?? []}
-                owner={{ username, avatar_url: owner.avatar_url }}
-                latestVersion={latest?.version ?? null}
-              />
-            )
-          })}
-        </div>
-      )}
+      <AssetGrid
+        assets={assets}
+        defaultOwner={{ username, avatar_url: owner.avatar_url }}
+        emptyState={<p className="text-sm text-muted-foreground">No public assets yet.</p>}
+      />
     </Container>
   )
 }

@@ -25,7 +25,7 @@ const SIMPLE_COMMANDS = [
   { cmd: 'versions <owner/name>', desc: 'List all versions' },
 ] as const
 
-import { AssetCard } from '@/components/asset-card'
+import { AssetGrid } from '@/components/asset-grid'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
 import { createServiceClient } from '@/utils/supabase/service'
@@ -110,35 +110,15 @@ export default async function Home() {
           ></Button>
         </div>
 
-        {assets.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No assets yet. Be the first to push one.</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {assets.map((asset) => {
-              const versions = asset.asset_versions as {
-                version: string
-                created_at: string
-              }[]
-              const latest = versions?.[0]?.version ?? null
-              return (
-                <AssetCard
-                  key={asset.id}
-                  slug={asset.slug}
-                  description={asset.description}
-                  asset_format={asset.asset_format}
-                  tags={asset.tags ?? []}
-                  owner={
-                    asset.users as {
-                      username: string
-                      avatar_url: string | null
-                    }
-                  }
-                  latestVersion={latest}
-                />
-              )
-            })}
-          </div>
-        )}
+        <AssetGrid
+          columns={4}
+          assets={assets}
+          emptyState={
+            <p className="text-sm text-muted-foreground">
+              No assets yet. Be the first to push one.
+            </p>
+          }
+        />
       </Container>
 
       {/* Install strip */}

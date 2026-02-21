@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { AssetCard } from '@/components/asset-card'
+import { AssetGrid } from '@/components/asset-grid'
 import { Container } from '@/components/container'
 import { ExploreFilters } from '@/components/explore-filters'
 import { createServiceClient } from '@/utils/supabase/service'
@@ -73,45 +73,21 @@ export default async function ExplorePage({
         {assets.length} {assets.length === 1 ? 'result' : 'results'}
       </div>
 
-      {assets.length === 0 ? (
-        <div className="border py-16 text-center">
-          <p className="text-sm text-muted-foreground">No assets found.</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Try a different search or{' '}
-            <Link href="/new" className="underline">
-              push your first asset
-            </Link>
-            .
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {assets.map((asset, i) => {
-            const versions = asset.asset_versions as {
-              version: string
-              created_at: string
-            }[]
-            const latest = versions?.[0]?.version ?? null
-            return (
-              <div key={asset.id}>
-                <AssetCard
-                  slug={asset.slug}
-                  description={asset.description}
-                  asset_format={asset.asset_format}
-                  tags={asset.tags ?? []}
-                  owner={
-                    asset.users as {
-                      username: string
-                      avatar_url: string | null
-                    }
-                  }
-                  latestVersion={latest}
-                />
-              </div>
-            )
-          })}
-        </div>
-      )}
+      <AssetGrid
+        assets={assets}
+        emptyState={
+          <div className="border py-16 text-center">
+            <p className="text-sm text-muted-foreground">No assets found.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Try a different search or{' '}
+              <Link href="/new" className="underline">
+                push your first asset
+              </Link>
+              .
+            </p>
+          </div>
+        }
+      />
     </Container>
   )
 }
