@@ -126,6 +126,13 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
+  if (is_public === true) {
+    return NextResponse.json(
+      { error: 'Skill and bundle assets cannot be made public' },
+      { status: 400 },
+    )
+  }
+
   const { data: asset, error: assetError } = await service
     .from('assets')
     .upsert(

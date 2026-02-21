@@ -89,6 +89,7 @@ function friendlyPushError(err: unknown, version: string, slug: string): string 
 
   if (status === 401) return 'Not authenticated. Run `amulets login` first.'
   if (status === 413) return 'Package exceeds the 4 MB size limit.'
+  if (message.includes('cannot be made public')) return message
   if (
     status === 409 ||
     message.includes('duplicate key') ||
@@ -156,6 +157,13 @@ export function registerPush(program: Command): void {
               .map((t) => t.trim())
               .filter(Boolean)
           : []
+
+        if (isPublic && format !== 'file') {
+          console.error(
+            `Error: only file assets can be made public. Skill and bundle packages are always private.`,
+          )
+          process.exit(1)
+        }
 
         const spinner = ora('Pushing asset...').start()
 

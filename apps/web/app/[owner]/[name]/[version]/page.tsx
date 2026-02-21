@@ -3,15 +3,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
-import { FileTree } from '@/components/file-tree'
 import { MarkdownContent } from '@/components/markdown-content'
 import { Badge } from '@/components/ui/badge'
 import { createServiceClient } from '@/utils/supabase/service'
-
-interface FileEntry {
-  path: string
-  size: number
-}
 
 interface PageParams {
   owner: string
@@ -42,7 +36,7 @@ async function getVersion(owner: string, name: string, version: string) {
 
   const versionQuery = service
     .from('asset_versions')
-    .select('id, version, message, content, file_manifest, created_at')
+    .select('id, version, message, content, created_at')
     .eq('asset_id', asset.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -127,12 +121,10 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
           {/* Content */}
           <div>
             <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {asset.asset_format !== 'file' ? 'Files' : 'Content'}
+              Content
             </div>
 
-            {asset.asset_format !== 'file' && av.file_manifest ? (
-              <FileTree manifest={av.file_manifest as unknown as FileEntry[]} />
-            ) : av.content ? (
+            {av.content ? (
               <MarkdownContent content={av.content} />
             ) : (
               <p className="text-sm text-muted-foreground">No content available.</p>

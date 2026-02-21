@@ -3,17 +3,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
-import { FileTree } from '@/components/file-tree'
 import { MarkdownContent } from '@/components/markdown-content'
 import { ReportButton } from '@/components/report-button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/utils/supabase/server'
 import { createServiceClient } from '@/utils/supabase/service'
-
-interface FileEntry {
-  path: string
-  size: number
-}
 
 interface PageParams {
   owner: string
@@ -33,9 +27,7 @@ async function getAsset(owner: string, name: string) {
 
   const { data: asset } = await service
     .from('assets')
-    .select(
-      '*, asset_versions(id, version, message, content, storage_path, file_manifest, created_at)',
-    )
+    .select('*, asset_versions(id, version, message, content, created_at)')
     .eq('owner_id', userRecord.id)
     .eq('slug', name)
     .order('created_at', {
@@ -71,8 +63,6 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
     version: string
     message: string | null
     content: string | null
-    storage_path: string | null
-    file_manifest: FileEntry[] | null
     created_at: string
   }[]
 
@@ -151,12 +141,10 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
           {/* Content */}
           <div>
             <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {asset.asset_format !== 'file' ? 'Files' : 'Content'}
+              Content
             </div>
 
-            {asset.asset_format !== 'file' && latest?.file_manifest ? (
-              <FileTree manifest={latest.file_manifest} />
-            ) : latest?.content ? (
+            {latest?.content ? (
               <MarkdownContent content={latest.content} />
             ) : (
               <p className="text-sm text-muted-foreground">No content available.</p>
