@@ -1,6 +1,6 @@
 import type { Command } from 'commander'
 import ora from 'ora'
-import { ApiError, getAssetVersions } from '../lib/api.js'
+import { ApiError, getAssetVersions, getMe } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 export function registerVersions(program: Command): void {
@@ -8,15 +8,30 @@ export function registerVersions(program: Command): void {
     .command('versions <owner/name>')
     .description('List all versions of an asset')
     .action(async (ownerName: string) => {
-      const parts = ownerName.split('/')
-      if (parts.length !== 2 || !parts[0] || !parts[1]) {
-        console.error('Error: argument must be in <owner/name> format')
-        process.exit(1)
-      }
-      const [owner, name] = parts
-
       const token = await requireToken()
-      const spinner = ora(`Fetching versions for ${ownerName}...`).start()
+
+      let owner: string
+      let name: string
+
+      if (ownerName.includes('/')) {
+        const parts = ownerName.split('/')
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+          console.error('Error: argument must be in <owner/name> or <name> format')
+          process.exit(1)
+        }
+        owner = parts[0]
+        name = parts[1]
+      } else {
+        const me = await getMe(token)
+        if (!me.username) {
+          console.error('Error: could not resolve your username — use <owner/name> format')
+          process.exit(1)
+        }
+        owner = me.username
+        name = ownerName
+      }
+
+      const spinner = ora(`Fetching versions for ${owner}/${name}...`).start()
 
       try {
         const { versions } = await getAssetVersions(owner, name, token)
