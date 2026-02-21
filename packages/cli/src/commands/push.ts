@@ -20,8 +20,10 @@ function toSlug(name: string): string {
     .replace(/^-|-$/g, '')
 }
 
-function isSkillPackage(folderPath: string): boolean {
-  return fs.existsSync(path.join(folderPath, 'SKILL.md'))
+function detectFormat(resolvedPath: string, isDirectory: boolean): 'file' | 'skill' | 'bundle' {
+  if (!isDirectory) return 'file'
+  if (fs.existsSync(path.join(resolvedPath, 'SKILL.md'))) return 'skill'
+  return 'bundle'
 }
 
 async function buildFileManifest(folderPath: string): Promise<FileEntry[]> {
@@ -64,14 +66,13 @@ async function zipFolder(folderPath: string): Promise<Buffer> {
 export function registerPush(program: Command): void {
   program
     .command('push <path>')
-    .description('Push an asset (file or skill package folder) to the registry')
-    .requiredOption('--name <name>', 'Asset name')
-    .option('--public', 'Make this asset publicly visible')
-    .option('--version <version>', 'Version (semver)', '1.0.0')
-    .option('--message <message>', 'Version message')
-    .option('--tags <tags>', 'Comma-separated tags (e.g. claude,prompt)')
-    .option('--type <type>', 'Asset type: skill | prompt | cursorrules | agentsmd | config')
-    .option('--description <description>', 'Short description')
+    .description('Push an asset (file or skill/bundle folder) to the registry')
+    .requiredOption('-n, --name <name>', 'Asset name')
+    .option('-p, --public', 'Make this asset publicly visible')
+    .option('-v, --version <version>', 'Version (semver)', '1.0.0')
+    .option('-m, --message <message>', 'Version message')
+    .option('-t, --tags <tags>', 'Comma-separated tags (e.g. claude,prompt)')
+    .option('-d, --description <description>', 'Short description')
     .action(
       async (
         assetPath: string,
@@ -81,7 +82,6 @@ export function registerPush(program: Command): void {
           version: string
           message?: string
           tags?: string
-          type?: string
           description?: string
         },
       ) => {
@@ -95,6 +95,8 @@ export function registerPush(program: Command): void {
         }
 
         const stats = fs.statSync(resolvedPath)
+        const isDirectory = stats.isDirectory()
+        const format = detectFormat(resolvedPath, isDirectory)
         const slug = toSlug(options.name)
         const tags = options.tags
           ? options.tags
@@ -106,15 +108,7 @@ export function registerPush(program: Command): void {
         const spinner = ora('Pushing asset...').start()
 
         try {
-          if (stats.isDirectory()) {
-            if (!isSkillPackage(resolvedPath)) {
-              spinner.fail(
-                'Folder must contain SKILL.md to be pushed as a skill package.\n' +
-                  'To push a single file, pass the file path instead.',
-              )
-              process.exit(1)
-            }
-
+          if (format === 'skill' || format === 'bundle') {
             spinner.text = 'Building file manifest...'
             const fileManifest = await buildFileManifest(resolvedPath)
 
@@ -129,7 +123,7 @@ export function registerPush(program: Command): void {
                 name: options.name,
                 slug,
                 description: options.description,
-                type: options.type,
+                asset_format: format,
                 tags,
                 version: options.version,
                 message: options.message,
@@ -150,7 +144,7 @@ export function registerPush(program: Command): void {
             const result = await pushPackageAsset(token, formData)
             const visibility = isPublic ? 'public' : 'private'
             spinner.succeed(
-              `Pushed ${visibility} skill package: ${result.asset.slug} @ ${result.version.version}`,
+              `Pushed ${visibility} ${format}: ${result.asset.slug} @ ${result.version.version}`,
             )
           } else {
             // Simple asset (single file)
@@ -162,7 +156,6 @@ export function registerPush(program: Command): void {
               name: options.name,
               slug,
               description: options.description,
-              type: options.type,
               tags,
               version: options.version,
               message: options.message,
@@ -171,7 +164,7 @@ export function registerPush(program: Command): void {
             })
             const visibility = isPublic ? 'public' : 'private'
             spinner.succeed(
-              `Pushed ${visibility} asset: ${result.asset.slug} @ ${result.version.version}`,
+              `Pushed ${visibility} file: ${result.asset.slug} @ ${result.version.version}`,
             )
           }
         } catch (err) {

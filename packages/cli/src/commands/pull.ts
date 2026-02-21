@@ -27,9 +27,9 @@ export function registerPull(program: Command): void {
   program
     .command('pull <name>')
     .description('Pull an asset from the registry (name or owner/name)')
-    .option('--output <path>', 'Output file path (simple asset) or directory (package)')
-    .option('--version <version>', 'Version to pull (defaults to latest)', 'latest')
-    .option('--approve', 'Approve pulling a public asset you do not own')
+    .option('-o, --output <path>', 'Output file path (simple asset) or directory (package)')
+    .option('-v, --version <version>', 'Version to pull (defaults to latest)', 'latest')
+    .option('-a, --approve', 'Approve pulling a public asset you do not own')
     .action(
       async (nameArg: string, options: { output?: string; version: string; approve?: boolean }) => {
         const token = await requireToken()

@@ -24,20 +24,19 @@ export function registerList(program: Command): void {
           const versions = a.asset_versions ?? []
           const latest = versions[0]?.version ?? '—'
           const count = versions.length
-          const format = a.asset_format === 'package' ? 'pkg' : 'file'
-          return { name: a.slug, format, type: a.type ?? '—', latest, versions: count }
+          return { name: a.slug, format: a.asset_format, latest, versions: count }
         })
 
         const nameWidth = Math.max(4, ...rows.map((r) => r.name.length))
-        const typeWidth = Math.max(4, ...rows.map((r) => r.type.length))
+        const formatWidth = Math.max(6, ...rows.map((r) => r.format.length))
 
-        const header = `${'NAME'.padEnd(nameWidth)}  ${'FMT'.padEnd(4)}  ${'TYPE'.padEnd(typeWidth)}  ${'LATEST'.padEnd(8)}  VERSIONS`
+        const header = `${'NAME'.padEnd(nameWidth)}  ${'FORMAT'.padEnd(formatWidth)}  ${'LATEST'.padEnd(8)}  VERSIONS`
         console.log(header)
         console.log('─'.repeat(header.length))
 
         for (const r of rows) {
           console.log(
-            `${r.name.padEnd(nameWidth)}  ${r.format.padEnd(4)}  ${r.type.padEnd(typeWidth)}  ${r.latest.padEnd(8)}  ${r.versions}`,
+            `${r.name.padEnd(nameWidth)}  ${r.format.padEnd(formatWidth)}  ${r.latest.padEnd(8)}  ${r.versions}`,
           )
         }
       } catch (err) {

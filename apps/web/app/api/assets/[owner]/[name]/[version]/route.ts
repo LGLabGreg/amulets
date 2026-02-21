@@ -72,7 +72,7 @@ export async function GET(
     return NextResponse.json({ version: av.version, content: av.content })
   }
 
-  // Package: return a signed download URL
+  // Skill/bundle: return a signed download URL
   const { data: signedUrl, error: storageError } = await service.storage
     .from('packages')
     .createSignedUrl(av.storage_path!, 3600)

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/utils/api-auth'
 import { createServiceClient } from '@/utils/supabase/service'
 
-const VALID_TYPES = ['skill', 'prompt', 'cursorrules', 'agentsmd', 'config'] as const
-
 export async function POST(request: Request) {
   const user = await getAuthUser(request)
   if (!user) {
@@ -35,7 +33,7 @@ export async function POST(request: Request) {
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
-  const { name, slug, description, type, tags, version, message, content, is_public } = body
+  const { name, slug, description, tags, version, message, content, is_public } = body
 
   if (!name || !slug || !version || !content) {
     return NextResponse.json(
@@ -51,13 +49,6 @@ async function handleSimplePush(request: Request, ownerId: string) {
     )
   }
 
-  if (type && !VALID_TYPES.includes(type)) {
-    return NextResponse.json(
-      { error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` },
-      { status: 400 },
-    )
-  }
-
   const { data: asset, error: assetError } = await service
     .from('assets')
     .upsert(
@@ -67,7 +58,6 @@ async function handleSimplePush(request: Request, ownerId: string) {
         slug,
         description: description ?? null,
         asset_format: 'file',
-        type: type ?? null,
         tags: tags ?? [],
         is_public: is_public === true,
       },
@@ -111,7 +101,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  const { name, slug, description, type, tags, version, message, is_public } =
+  const { name, slug, description, asset_format, tags, version, message, is_public } =
     JSON.parse(metadataStr)
   const file_manifest = JSON.parse(fileManifestStr)
 
@@ -129,9 +119,9 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  if (type && !VALID_TYPES.includes(type)) {
+  if (!asset_format || !['skill', 'bundle'].includes(asset_format)) {
     return NextResponse.json(
-      { error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` },
+      { error: 'asset_format must be "skill" or "bundle" for directory pushes' },
       { status: 400 },
     )
   }
@@ -144,8 +134,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
         name,
         slug,
         description: description ?? null,
-        asset_format: 'package',
-        type: type ?? null,
+        asset_format,
         tags: tags ?? [],
         is_public: is_public === true,
       },

@@ -30,7 +30,7 @@ async function getVersion(owner: string, name: string, version: string) {
 
   const { data: asset } = await service
     .from('assets')
-    .select('id, name, slug, description, type, asset_format, tags, created_at')
+    .select('id, name, slug, description, asset_format, tags, created_at')
     .eq('owner_id', userRecord.id)
     .eq('slug', name)
     .eq('is_public', true)
@@ -101,11 +101,8 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
 
           {/* Badges */}
           <div className="mb-6 flex flex-wrap gap-1.5">
-            <Badge variant="secondary" className="font-mono text-xs">
-              {asset.type}
-            </Badge>
             <Badge variant="outline" className="font-mono text-xs">
-              {asset.asset_format === 'package' ? 'skill package' : 'file'}
+              {asset.asset_format}
             </Badge>
             {(asset.tags ?? []).map((tag: string) => (
               <Badge key={tag} variant="outline" className="font-mono text-xs">
@@ -127,10 +124,10 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
           {/* Content */}
           <div>
             <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {asset.asset_format === 'package' ? 'Files' : 'Content'}
+              {asset.asset_format !== 'file' ? 'Files' : 'Content'}
             </div>
 
-            {asset.asset_format === 'package' && av.file_manifest ? (
+            {asset.asset_format !== 'file' && av.file_manifest ? (
               <FileTree manifest={av.file_manifest as unknown as FileEntry[]} />
             ) : av.content ? (
               <MarkdownContent content={av.content} />

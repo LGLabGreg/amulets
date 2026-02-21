@@ -115,11 +115,8 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
 
           {/* Badges */}
           <div className="mb-6 flex flex-wrap gap-1.5">
-            <Badge variant="secondary" className="font-mono text-xs">
-              {asset.type}
-            </Badge>
             <Badge variant="outline" className="font-mono text-xs">
-              {asset.asset_format === 'package' ? 'skill package' : 'file'}
+              {asset.asset_format}
             </Badge>
             <Badge variant={asset.is_public ? 'default' : 'outline'} className="font-mono text-xs">
               {asset.is_public ? 'public' : 'private'}
@@ -156,10 +153,10 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
           {/* Content */}
           <div>
             <div className="mb-3 border-b pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {asset.asset_format === 'package' ? 'Files' : 'Content'}
+              {asset.asset_format !== 'file' ? 'Files' : 'Content'}
             </div>
 
-            {asset.asset_format === 'package' && latest?.file_manifest ? (
+            {asset.asset_format !== 'file' && latest?.file_manifest ? (
               <FileTree manifest={latest.file_manifest} />
             ) : latest?.content ? (
               <MarkdownContent content={latest.content} />

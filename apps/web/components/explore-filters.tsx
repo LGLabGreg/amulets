@@ -2,8 +2,8 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useRef, useTransition } from 'react'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -13,16 +13,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const ASSET_TYPES = ['prompt', 'skill', 'cursorrules', 'agents-md', 'other']
-const FORMATS = ['file', 'package']
+const FORMATS = ['file', 'skill', 'bundle']
 
 interface ExploreFiltersProps {
   defaultQ?: string
-  defaultType?: string
   defaultFormat?: string
 }
 
-export function ExploreFilters({ defaultQ, defaultType, defaultFormat }: ExploreFiltersProps) {
+export function ExploreFilters({ defaultQ, defaultFormat }: ExploreFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -31,22 +29,13 @@ export function ExploreFilters({ defaultQ, defaultType, defaultFormat }: Explore
   function buildParams(overrides: Record<string, string | undefined>) {
     const params = new URLSearchParams()
     const q = overrides.q ?? searchRef.current?.value ?? defaultQ
-    const type = overrides.type !== undefined ? overrides.type : (searchParams.get('type') ?? '')
     const format =
       overrides.format !== undefined ? overrides.format : (searchParams.get('format') ?? '')
 
     if (q) params.set('q', q)
-    if (type) params.set('type', type)
     if (format) params.set('format', format)
 
     return params.toString()
-  }
-
-  function onTypeChange(value: string | null) {
-    startTransition(() => {
-      const qs = buildParams({ type: !value || value === 'all' ? '' : value })
-      router.push(`/explore${qs ? `?${qs}` : ''}`)
-    })
   }
 
   function onFormatChange(value: string | null) {
@@ -77,25 +66,6 @@ export function ExploreFilters({ defaultQ, defaultType, defaultFormat }: Explore
           placeholder="Search by name or description…"
           className="font-mono"
         />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Type
-        </Label>
-        <Select value={defaultType ?? 'all'} onValueChange={onTypeChange}>
-          <SelectTrigger className="font-mono">
-            <SelectValue placeholder="All types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            {ASSET_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="flex flex-col gap-1">

@@ -5,7 +5,6 @@ import { createServiceClient } from '@/utils/supabase/service'
 
 interface SearchParams {
   q?: string
-  type?: string
   format?: string
 }
 
@@ -24,7 +23,6 @@ async function searchAssets(params: SearchParams) {
       config: 'english',
     })
   }
-  if (params.type) query = query.eq('type', params.type)
   if (params.format) query = query.eq('asset_format', params.format)
 
   const { data } = await query.order('created_at', { ascending: false }).limit(50)
@@ -43,7 +41,7 @@ export default async function ExplorePage({
     <div className="mx-auto max-w-6xl px-4 py-10">
       {/* Header */}
       <div className="mb-8 border-b pb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Public Assets</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Public Amulets</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Browse public AI workflow assets shared by the community. Review content before use. Pull
           via CLI with <code className="font-mono text-xs">--approve</code>.
@@ -51,16 +49,15 @@ export default async function ExplorePage({
       </div>
 
       {/* Search + filters */}
-      <ExploreFilters defaultQ={params.q} defaultType={params.type} defaultFormat={params.format} />
+      <ExploreFilters defaultQ={params.q} defaultFormat={params.format} />
 
       {/* Active filters */}
-      {(params.q || params.type || params.format) && (
+      {(params.q || params.format) && (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span>Showing results for:</span>
           {params.q && (
             <span className="border px-2 py-0.5 font-mono">&ldquo;{params.q}&rdquo;</span>
           )}
-          {params.type && <span className="border px-2 py-0.5 font-mono">type: {params.type}</span>}
           {params.format && (
             <span className="border px-2 py-0.5 font-mono">format: {params.format}</span>
           )}
@@ -99,7 +96,6 @@ export default async function ExplorePage({
                 <AssetCard
                   slug={asset.slug}
                   description={asset.description}
-                  type={asset.type ?? 'other'}
                   asset_format={asset.asset_format}
                   tags={asset.tags ?? []}
                   owner={

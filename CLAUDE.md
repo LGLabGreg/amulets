@@ -65,6 +65,8 @@ pnpm --filter amulets-cli add some-package@latest
 
 - Supabase Postgres with Row Level Security
 - Migrations in `apps/web/supabase/migrations/`
+- **Use the Supabase MCP server** to apply migrations and query the database directly — it is configured in `~/.claude.json` and available in Claude Code sessions
+- **Never manually edit `apps/web/lib/database.types.ts`** — it is auto-generated from the live schema. If types and code conflict, the code is wrong; fix the code or write a migration
 
 ## Environment Variables
 
@@ -85,24 +87,26 @@ CLI reads from `~/.config/amulets/config.json` (written by `amulets login`).
 - **API large file handling**: for skill package pulls, API returns a signed Supabase Storage URL — CLI downloads directly from storage, not proxied through Next.js
 - **Auth**: GitHub OAuth via Supabase Auth. CLI uses a browser-based OAuth flow, stores access token locally.
 
-## Two Asset Formats
+## Three Asset Formats
 
-1. **Simple asset** — single markdown file (prompts, cursorrules, AGENTS.md, etc.)
-2. **Skill package** — folder conforming to agentskills.io spec. Must contain `SKILL.md` with YAML frontmatter:
-   ```yaml
-   ---
-   name: docx-processing
-   description: Create and edit Word documents.
-   ---
-   ```
+1. **file** — single markdown file (prompts, AGENTS.md, CLAUDE.md, .cursorrules, etc.)
+2. **skill** — directory containing `SKILL.md` (agentskills.io compliant)
+3. **bundle** — any other directory (cursor rules sets, windsurf rules, etc.)
 
-Auto-detection on `amulets push`: if a folder is passed and contains `SKILL.md` → skill package. Otherwise → simple asset.
+Auto-detection on `amulets push`:
+
+- Single file → `file`
+- Directory with `SKILL.md` → `skill`
+- Directory without `SKILL.md` → `bundle`
+
+All directory formats (skill + bundle) are stored as zipped archives in Supabase Storage.
+The `type` column has been removed. Use `tags` for categorisation instead.
 
 ## Data Model (key tables)
 
 ```
 User:          id, github_id, username, avatar_url, created_at
-Asset:         id, owner_id, name, slug, description, asset_format (file|package), type, tags[], is_public
+Asset:         id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], is_public
 AssetVersion:  id, asset_id, version (semver), message, content (nullable), storage_path (nullable), file_manifest (jsonb), created_at
 Collection:    id, owner_id, name, slug, description, is_public
 CollectionItem: id, collection_id, asset_id, pinned_version_id, order

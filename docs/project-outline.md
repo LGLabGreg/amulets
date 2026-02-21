@@ -34,17 +34,17 @@ amulet pull my-nextjs-stack --output ./
 
 ## Asset Formats
 
-Amulet handles two distinct asset formats:
+Amulet handles three distinct asset formats:
 
-### Simple Asset
+### file
 
-A single markdown file. Used for prompts, `.cursorrules`, `AGENTS.md`, system instructions, and any standalone text.
+A single markdown file. Used for prompts, `.cursorrules`, `AGENTS.md`, `CLAUDE.md`, system instructions, and any standalone text.
 
 ```
 refactor-prompt.md
 ```
 
-### Skill Package
+### skill
 
 A folder conforming to the [agentskills.io](https://agentskills.io) open spec. Must contain a `SKILL.md` with YAML frontmatter. Optional subdirectories for scripts, references, and assets.
 
@@ -65,9 +65,17 @@ description: Create and edit Word documents with formatting, tables, and images.
 ---
 ```
 
-**Auto-detection on push:** if a folder is passed and contains `SKILL.md`, it is treated as a skill package and stored as a versioned zip bundle. If a single file is passed, it is stored as a simple asset.
+### bundle
 
-**On pull:** skill packages are unpacked into the target output directory, restoring the original folder structure.
+Any other directory without a `SKILL.md`. Used for cursor rules sets, windsurf rules, multi-file prompt collections, etc.
+
+**Auto-detection on push:**
+
+- Single file → `file`
+- Directory with `SKILL.md` → `skill`
+- Directory without `SKILL.md` → `bundle`
+
+**On pull:** skill and bundle archives are unpacked into the target output directory, restoring the original folder structure.
 
 ---
 
@@ -112,8 +120,7 @@ User
   id, github_id, username, avatar_url, created_at
 
 Asset
-  id, owner_id, name, slug, description, asset_format (file|package),
-  type (skill|prompt|cursorrules|agentsmd|config), tags[], is_public, created_at
+  id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], is_public, created_at
 
 AssetVersion
   id, asset_id, version (semver), message, created_at
@@ -149,8 +156,7 @@ amulet push <file-or-folder> [options]
   --name     asset name/slug
   --message  "version message"
   --tags     comma-separated tags
-  --type     skill|prompt|cursorrules|agentsmd|config
-  # format auto-detected: folder with SKILL.md = skill package, otherwise simple asset
+  # format auto-detected: file = file, folder with SKILL.md = skill, folder without = bundle
 
 amulet pull <owner/name>              # pull asset into current dir
   --output   ./path/to/output/        # for packages, unpacks folder here

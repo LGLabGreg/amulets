@@ -81,10 +81,10 @@ export default async function DashboardPage() {
         </div>
         <div className="px-4 py-3">
           <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
-            Packages
+            Directories
           </p>
           <p className="font-mono text-2xl font-bold mt-1">
-            {assets.filter((a) => a.asset_format === 'package').length}
+            {assets.filter((a) => a.asset_format !== 'file').length}
           </p>
         </div>
         <div className="px-4 py-3">
@@ -115,10 +115,9 @@ export default async function DashboardPage() {
       ) : (
         <div className="border">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_80px_100px_80px_100px_100px] border-b bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="grid grid-cols-[1fr_80px_80px_100px_100px] border-b bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             <span>Name</span>
             <span>Visibility</span>
-            <span>Type</span>
             <span>Format</span>
             <span>Versions</span>
             <span>Updated</span>
@@ -136,7 +135,7 @@ export default async function DashboardPage() {
             return (
               <div
                 key={asset.id}
-                className={`grid grid-cols-[1fr_80px_100px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b' : ''}`}
+                className={`grid grid-cols-[1fr_80px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b' : ''}`}
               >
                 <div className="min-w-0">
                   <Link
@@ -157,11 +156,6 @@ export default async function DashboardPage() {
                     className="font-mono text-xs"
                   >
                     {asset.is_public ? 'public' : 'private'}
-                  </Badge>
-                </span>
-                <span>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    {asset.type}
                   </Badge>
                 </span>
                 <span className="text-xs text-muted-foreground font-mono">

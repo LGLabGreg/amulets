@@ -5,8 +5,7 @@ export interface Asset {
   name: string
   slug: string
   description: string | null
-  asset_format: 'file' | 'package'
-  type: string | null
+  asset_format: 'file' | 'skill' | 'bundle'
   tags: string[]
   is_public: boolean
   created_at: string
@@ -62,7 +61,6 @@ export async function pushSimpleAsset(
     name: string
     slug: string
     description?: string
-    type?: string
     tags?: string[]
     version: string
     message?: string

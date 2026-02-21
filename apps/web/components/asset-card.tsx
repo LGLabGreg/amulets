@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge'
 interface AssetCardProps {
   slug: string
   description: string | null
-  type: string
   asset_format: string
   tags: string[]
   owner: { username: string; avatar_url: string | null } | null
@@ -13,9 +12,8 @@ interface AssetCardProps {
 
 export function AssetCard({
   slug,
-  description,
-  type,
   asset_format,
+  description,
   tags,
   owner,
   latestVersion,
@@ -38,12 +36,9 @@ export function AssetCard({
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        <Badge variant="secondary" className="text-xs font-mono">
-          {type}
-        </Badge>
-        {asset_format === 'package' && (
-          <Badge variant="outline" className="text-xs font-mono">
-            pkg
+        {asset_format !== 'file' && (
+          <Badge variant="secondary" className="text-xs font-mono">
+            {asset_format}
           </Badge>
         )}
         {tags.slice(0, 3).map((tag) => (

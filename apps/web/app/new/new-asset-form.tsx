@@ -14,22 +14,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createAssetAction } from './actions'
-
-const ASSET_TYPES = ['prompt', 'skill', 'cursorrules', 'agents-md', 'other'] as const
 
 const schema = z.object({
   name: z.string().min(1, 'Required'),
   description: z.string().optional(),
-  type: z.enum(ASSET_TYPES),
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Must be semver e.g. 1.0.0'),
   message: z.string().optional(),
   content: z.string().min(1, 'Required'),
@@ -54,7 +44,6 @@ export function NewAssetForm({ username }: { username: string }) {
     defaultValues: {
       name: '',
       description: '',
-      type: 'prompt',
       version: '1.0.0',
       message: '',
       content: '',
@@ -121,49 +110,21 @@ export function NewAssetForm({ username }: { username: string }) {
           />
         </div>
 
-        {/* Type + Version row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border border-b">
-          <div className="p-4">
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Type</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full font-mono">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ASSET_TYPES.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="p-4">
-            <FormField
-              control={form.control}
-              name="version"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Version</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="1.0.0" className="font-mono" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        {/* Version */}
+        <div className="border-b p-4">
+          <FormField
+            control={form.control}
+            name="version"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Version</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="1.0.0" className="font-mono" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* Release notes */}
@@ -238,8 +199,8 @@ export function NewAssetForm({ username }: { username: string }) {
         {/* Package note */}
         <div className="border-b bg-muted/30 px-4 py-3">
           <p className="text-xs text-muted-foreground">
-            <span className="font-semibold">Pushing a skill package?</span> Use the CLI:{' '}
-            <span className="font-mono">amulets push ./my-skill-folder</span>
+            <span className="font-semibold">Pushing a skill or bundle?</span> Use the CLI:{' '}
+            <span className="font-mono">amulets push ./my-folder</span>
           </p>
         </div>
 

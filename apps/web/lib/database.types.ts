@@ -126,7 +126,6 @@ export type Database = {
           owner_id: string
           slug: string
           tags: string[]
-          type: string | null
         }
         Insert: {
           asset_format: string
@@ -140,7 +139,6 @@ export type Database = {
           owner_id: string
           slug: string
           tags?: string[]
-          type?: string | null
         }
         Update: {
           asset_format?: string
@@ -154,7 +152,6 @@ export type Database = {
           owner_id?: string
           slug?: string
           tags?: string[]
-          type?: string | null
         }
         Relationships: [
           {
