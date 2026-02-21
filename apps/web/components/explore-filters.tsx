@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useRef, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,15 +24,19 @@ export function ExploreFilters({ defaultQ, defaultFormat }: ExploreFiltersProps)
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-  const searchRef = useRef<HTMLInputElement>(null)
+  const [q, setQ] = useState(defaultQ ?? '')
+
+  useEffect(() => {
+    setQ(defaultQ ?? '')
+  }, [defaultQ])
 
   function buildParams(overrides: Record<string, string | undefined>) {
     const params = new URLSearchParams()
-    const q = overrides.q ?? searchRef.current?.value ?? defaultQ
+    const searchQ = overrides.q ?? q
     const format =
       overrides.format !== undefined ? overrides.format : (searchParams.get('format') ?? '')
 
-    if (q) params.set('q', q)
+    if (searchQ) params.set('q', searchQ)
     if (format) params.set('format', format)
 
     return params.toString()
@@ -60,9 +64,9 @@ export function ExploreFilters({ defaultQ, defaultFormat }: ExploreFiltersProps)
           Search
         </Label>
         <Input
-          ref={searchRef}
           name="q"
-          defaultValue={defaultQ ?? ''}
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Search by name or description…"
           className="font-mono"
         />

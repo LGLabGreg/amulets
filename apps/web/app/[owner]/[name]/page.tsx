@@ -129,27 +129,24 @@ export default async function AssetDetailPage({ params }: { params: Promise<Page
             ))}
           </div>
 
-          {/* Pull command */}
-          <div className="mb-4 border bg-muted/30 px-4 py-3">
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Pull via CLI
-            </p>
-            <pre className="font-mono text-sm text-foreground select-all">
-              {isOwner
-                ? `amulets pull ${owner}/${name}`
-                : `amulets pull ${owner}/${name} --approve`}
-            </pre>
+          {/* Actions */}
+          <div className="mb-8 flex gap-2">
+            <CopyButton
+              text={
+                isOwner
+                  ? `amulets pull ${owner}/${name}`
+                  : `amulets pull ${owner}/${name} --approve`
+              }
+              label={
+                isOwner
+                  ? `amulets pull ${owner}/${name}`
+                  : `amulets pull ${owner}/${name} --approve`
+              }
+            />
+            {asset.asset_format === 'file' && latest?.content && (
+              <CopyButton text={latest.content} label="Copy file" />
+            )}
           </div>
-
-          {/* Copy content button — only for public simple assets */}
-          {asset.is_public && asset.asset_format === 'file' && latest?.content && (
-            <div className="mb-8 border bg-muted/30 px-4 py-3 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Copy content
-              </p>
-              <CopyButton text={latest.content} label="Copy to clipboard" />
-            </div>
-          )}
 
           {/* Content */}
           <div>

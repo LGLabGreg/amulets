@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/container'
+import { CopyButton } from '@/components/copy-button'
 import { FileTree } from '@/components/file-tree'
 import { MarkdownContent } from '@/components/markdown-content'
 import { Badge } from '@/components/ui/badge'
@@ -112,14 +113,15 @@ export default async function VersionDetailPage({ params }: { params: Promise<Pa
             ))}
           </div>
 
-          {/* Pull command for this version */}
-          <div className="mb-8 border bg-muted/30 px-4 py-3">
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Pull this version
-            </p>
-            <pre className="font-mono text-sm text-foreground select-all">
-              amulets pull {owner}/{name}@{av.version}
-            </pre>
+          {/* Actions */}
+          <div className="mb-8 flex gap-2">
+            <CopyButton
+              text={`amulets pull ${owner}/${name}@${av.version}`}
+              label={`amulets pull ${owner}/${name}@${av.version}`}
+            />
+            {asset.asset_format === 'file' && av.content && (
+              <CopyButton text={av.content} label="Copy file" />
+            )}
           </div>
 
           {/* Content */}

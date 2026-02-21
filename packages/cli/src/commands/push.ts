@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { createInterface } from 'node:readline/promises'
 import { PassThrough } from 'node:stream'
 import archiver from 'archiver'
 import type { Command } from 'commander'
@@ -10,6 +11,18 @@ import { requireToken } from '../lib/config.js'
 interface FileEntry {
   path: string
   size: number
+}
+
+async function promptName(suggestion: string): Promise<string> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  try {
+    const p = rl.question('? Asset name › ')
+    rl.write(suggestion)
+    const answer = await p
+    return answer.trim() || suggestion
+  } finally {
+    rl.close()
+  }
 }
 
 function toSlug(name: string): string {
@@ -63,11 +76,38 @@ async function zipFolder(folderPath: string): Promise<Buffer> {
   })
 }
 
+function friendlyPushError(err: unknown, version: string, slug: string): string {
+  if (!(err instanceof ApiError)) {
+    const msg = String(err)
+    if (msg.includes('fetch failed') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')) {
+      return 'Could not reach the server. Check your internet connection.'
+    }
+    return msg
+  }
+
+  const { status, message } = err
+
+  if (status === 401) return 'Not authenticated. Run `amulets login` first.'
+  if (status === 413) return 'Package exceeds the 4 MB size limit.'
+  if (
+    status === 409 ||
+    message.includes('duplicate key') ||
+    message.includes('unique constraint')
+  ) {
+    return `Version ${version} of "${slug}" already exists. Use -v to specify a different version (e.g. -v 1.0.1).`
+  }
+  if (message.includes('"latest"')) {
+    return '"latest" is a reserved version name. Use a semver version like 1.0.0.'
+  }
+  if (status >= 500) return 'Server error. Please try again later.'
+  return message
+}
+
 export function registerPush(program: Command): void {
   program
     .command('push <path>')
     .description('Push an asset (file or skill/bundle folder) to the registry')
-    .requiredOption('-n, --name <name>', 'Asset name')
+    .option('-n, --name <name>', 'Asset name')
     .option('-p, --public', 'Make this asset publicly visible')
     .option('-v, --version <version>', 'Version (semver)', '1.0.0')
     .option('-m, --message <message>', 'Version message')
@@ -77,7 +117,7 @@ export function registerPush(program: Command): void {
       async (
         assetPath: string,
         options: {
-          name: string
+          name?: string
           public?: boolean
           version: string
           message?: string
@@ -97,7 +137,19 @@ export function registerPush(program: Command): void {
         const stats = fs.statSync(resolvedPath)
         const isDirectory = stats.isDirectory()
         const format = detectFormat(resolvedPath, isDirectory)
-        const slug = toSlug(options.name)
+
+        const suggestion = toSlug(
+          isDirectory
+            ? path.basename(resolvedPath)
+            : path.basename(resolvedPath, path.extname(resolvedPath)),
+        )
+        const name = options.name ?? (await promptName(suggestion))
+        if (!name) {
+          console.error('Error: asset name is required')
+          process.exit(1)
+        }
+
+        const slug = toSlug(name)
         const tags = options.tags
           ? options.tags
               .split(',')
@@ -120,7 +172,7 @@ export function registerPush(program: Command): void {
             formData.append(
               'metadata',
               JSON.stringify({
-                name: options.name,
+                name,
                 slug,
                 description: options.description,
                 asset_format: format,
@@ -153,7 +205,7 @@ export function registerPush(program: Command): void {
 
             spinner.text = 'Uploading asset...'
             const result = await pushSimpleAsset(token, {
-              name: options.name,
+              name,
               slug,
               description: options.description,
               tags,
@@ -168,8 +220,7 @@ export function registerPush(program: Command): void {
             )
           }
         } catch (err) {
-          const message = err instanceof ApiError ? err.message : String(err)
-          spinner.fail(`Push failed: ${message}`)
+          spinner.fail(`Push failed: ${friendlyPushError(err, options.version, slug)}`)
           process.exit(1)
         }
       },

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Container } from '@/components/container'
 
 const PUSH_FLAGS = [
-  { flag: '-n, --name <name>', desc: 'Asset name', required: true },
+  { flag: '-n, --name <name>', desc: 'Asset name' },
   { flag: '-p, --public', desc: 'Make publicly visible' },
   { flag: '-v, --version <ver>', desc: 'Semver version', default: '1.0.0' },
   { flag: '-m, --message <msg>', desc: 'Version message' },
@@ -26,7 +26,7 @@ const SIMPLE_COMMANDS = [
 ] as const
 
 import { AssetCard } from '@/components/asset-card'
-import { InstallButton } from '@/components/install-button'
+import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
 import { createServiceClient } from '@/utils/supabase/service'
 
@@ -65,7 +65,7 @@ export default async function Home() {
               </Button>
             </Link>
 
-            <InstallButton />
+            <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
           </div>
         </Container>
       </section>
@@ -76,7 +76,7 @@ export default async function Home() {
             {[
               {
                 label: 'Push an asset',
-                command: 'amulets push AGENTS.md --name agents',
+                command: 'amulets push AGENTS.md -n agents',
               },
               { label: 'Pull your asset', command: 'amulets pull agents' },
               {
@@ -97,7 +97,7 @@ export default async function Home() {
 
       {/* Recent assets */}
       <Container className="py-6 border-x">
-        <div className="mb-6 flex items-center justify-between pb-3">
+        <div className="flex items-center justify-between pb-4">
           <h2 className="font-semibold">Recently published</h2>
           <Button
             nativeButton={false}
@@ -113,7 +113,7 @@ export default async function Home() {
         {assets.length === 0 ? (
           <p className="text-sm text-muted-foreground">No assets yet. Be the first to push one.</p>
         ) : (
-          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4 border divide-y sm:divide-y-0 sm:divide-x divide-border">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {assets.map((asset) => {
               const versions = asset.asset_versions as {
                 version: string
@@ -150,7 +150,7 @@ export default async function Home() {
               Install the CLI, authenticate with GitHub, and start sharing.
             </p>
           </div>
-          <InstallButton />
+          <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
         </Container>
       </section>
 
@@ -190,9 +190,6 @@ export default async function Home() {
                     >
                       <span className="font-mono text-foreground flex items-center gap-1.5">
                         {f.flag}
-                        {'required' in f && f.required && (
-                          <span className="text-[10px] text-muted-foreground">*</span>
-                        )}
                       </span>
                       <span className="text-muted-foreground">
                         {f.desc}

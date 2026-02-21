@@ -1,6 +1,6 @@
 export default function Logo() {
   return (
-    <div className="w-6 h-6 [&>svg]:w-full [&>svg]:h-full">
+    <div className="w-6 h-6 [&>svg]:w-full [&>svg]:h-full dark:invert">
       <svg
         width="218.75"
         height="218.75"

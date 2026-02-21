@@ -42,7 +42,7 @@ export default async function ExplorePage({
     <Container>
       {/* Header */}
       <div className="mb-8 border-b pb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Public Amulets</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Public Assets</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Browse public AI workflow assets shared by the community. Review content before use. Pull
           via CLI with <code className="font-mono text-xs">--approve</code>.
@@ -85,7 +85,7 @@ export default async function ExplorePage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border divide-y sm:divide-y-0 divide-border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {assets.map((asset, i) => {
             const versions = asset.asset_versions as {
               version: string
@@ -93,7 +93,7 @@ export default async function ExplorePage({
             }[]
             const latest = versions?.[0]?.version ?? null
             return (
-              <div key={asset.id} className={i % 3 !== 2 ? 'sm:border-r' : ''}>
+              <div key={asset.id}>
                 <AssetCard
                   slug={asset.slug}
                   description={asset.description}
