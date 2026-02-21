@@ -121,6 +121,10 @@ export async function getAssetVersions(
   return request(`/api/assets/${owner}/${name}/versions`, { token })
 }
 
+export async function getMe(token: string): Promise<{ username: string | null; id: string }> {
+  return request('/api/auth/me', { token })
+}
+
 export async function listMyAssets(token: string): Promise<{
   assets: Array<
     Asset & { asset_versions: Array<{ id: string; version: string; created_at: string }> }

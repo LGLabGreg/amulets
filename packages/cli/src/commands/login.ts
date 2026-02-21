@@ -38,23 +38,41 @@ export function registerLogin(program: Command): void {
       console.log('Opening browser for GitHub authentication...')
       openBrowser(loginUrl)
 
-      const spinner = ora('Waiting for authentication...').start()
+      const spinner = ora({ text: 'Waiting for authentication...', discardStdin: false }).start()
+
+      const { promise: authPromise } = waitForCLIAuthCallback(port)
+
+      const onSigint = () => {
+        spinner.stop()
+        process.exit(0)
+      }
+      process.once('SIGINT', onSigint)
+
+      let timeoutId: ReturnType<typeof setTimeout> | undefined
 
       try {
         const result = await Promise.race([
-          waitForCLIAuthCallback(port),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Login timed out after 5 minutes')), 5 * 60 * 1000),
-          ),
+          authPromise,
+          new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(
+              () => reject(new Error('Login timed out after 5 minutes')),
+              5 * 60 * 1000,
+            )
+          }),
         ])
 
+        clearTimeout(timeoutId)
+        process.off('SIGINT', onSigint)
         writeConfig({
           token: result.token,
           refresh_token: result.refresh_token,
           expires_at: Date.now() + result.expires_in * 1000,
         })
         spinner.succeed('Logged in successfully.')
+        process.exit(0)
       } catch (err) {
+        clearTimeout(timeoutId)
+        process.off('SIGINT', onSigint)
         spinner.fail(`Login failed: ${err instanceof Error ? err.message : String(err)}`)
         process.exit(1)
       }

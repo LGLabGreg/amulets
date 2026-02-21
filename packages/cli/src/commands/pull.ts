@@ -4,7 +4,7 @@ import { Readable } from 'node:stream'
 import type { Command } from 'commander'
 import ora from 'ora'
 import unzipper from 'unzipper'
-import { ApiError, getAssetVersion } from '../lib/api.js'
+import { ApiError, getAssetVersion, getMe } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 async function downloadToBuffer(url: string): Promise<Buffer> {
@@ -25,25 +25,35 @@ async function unzipBuffer(buffer: Buffer, outputDir: string): Promise<void> {
 
 export function registerPull(program: Command): void {
   program
-    .command('pull <owner/name>')
-    .description('Pull an asset from the registry')
+    .command('pull <name>')
+    .description('Pull an asset from the registry (name or owner/name)')
     .option('--output <path>', 'Output file path (simple asset) or directory (package)')
     .option('--version <version>', 'Version to pull (defaults to latest)', 'latest')
     .option('--approve', 'Approve pulling a public asset you do not own')
     .action(
-      async (
-        ownerName: string,
-        options: { output?: string; version: string; approve?: boolean },
-      ) => {
+      async (nameArg: string, options: { output?: string; version: string; approve?: boolean }) => {
         const token = await requireToken()
 
-        const parts = ownerName.split('/')
-        if (parts.length !== 2 || !parts[0] || !parts[1]) {
-          console.error('Error: argument must be in <owner/name> format')
+        let owner: string
+        let name: string
+
+        const parts = nameArg.split('/')
+        if (parts.length === 2 && parts[0] && parts[1]) {
+          ;[owner, name] = parts
+        } else if (parts.length === 1 && parts[0]) {
+          const me = await getMe(token)
+          if (!me.username) {
+            console.error('Could not resolve your username. Use <owner/name> format instead.')
+            process.exit(1)
+          }
+          owner = me.username
+          name = parts[0]
+        } else {
+          console.error('Error: argument must be a name or <owner/name>')
           process.exit(1)
         }
-        const [owner, name] = parts
 
+        const ownerName = `${owner}/${name}`
         const spinner = ora(`Fetching ${ownerName}@${options.version}...`).start()
 
         try {

@@ -27,8 +27,13 @@ export interface CLIAuthResult {
  * Starts a local HTTP server that waits for the web-app to redirect back
  * with tokens in the query string.
  */
-export function waitForCLIAuthCallback(port: number): Promise<CLIAuthResult> {
-  return new Promise((resolve, reject) => {
+export function waitForCLIAuthCallback(port: number): {
+  promise: Promise<CLIAuthResult>
+  cancel: () => void
+} {
+  let serverRef: http.Server | null = null
+
+  const promise = new Promise<CLIAuthResult>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const url = new URL(req.url ?? '/', `http://localhost:${port}`)
       const token = url.searchParams.get('token')
@@ -64,7 +69,16 @@ export function waitForCLIAuthCallback(port: number): Promise<CLIAuthResult> {
       resolve({ token, refresh_token, expires_in })
     })
 
+    serverRef = server
     server.listen(port, () => {})
+    server.unref() // don't prevent process exit once auth completes
     server.on('error', reject)
   })
+
+  return {
+    promise,
+    cancel: () => {
+      serverRef?.close()
+    },
+  }
 }

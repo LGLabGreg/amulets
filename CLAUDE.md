@@ -112,6 +112,16 @@ CollectionItem: id, collection_id, asset_id, pinned_version_id, order
 
 All API routes live in `apps/web/app/api/`. Use Supabase service role client for mutations, anon client for public reads.
 
+## Shadcn/UI Rules
+
+- **Always read the component file before using it** — check actual props, not assumed Radix API
+- **base-lyra style uses Base UI primitives (not Radix)** — `asChild` does NOT exist on any component
+- **Never use raw HTML** (`<button>`, `<img>`, `<input>`) when a shadcn component exists (`Button`, `Avatar`, `Input`, etc.) — this applies everywhere including inside `render` props and client components
+- **Never add custom Tailwind classes** to shadcn components unless the user explicitly requests styling changes — use default component styles
+- **Composition pattern for navigation items**: put `<Link>` as children inside `<DropdownMenuItem>`, not via `asChild`
+- **`DropdownMenuLabel` must always be wrapped in `DropdownMenuGroup`** — Base UI requires `MenuPrimitive.GroupLabel` to have a `Menu.Group` parent or it throws at runtime
+- **Before adding a new shadcn component**, check `apps/web/components/ui/` first — it may already exist
+
 ## Task Plan
 
 See `docs/tasks.md` for the full task list. Work through tasks in order.

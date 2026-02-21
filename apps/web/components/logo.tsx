@@ -1,15 +1,15 @@
 export default function Logo() {
   return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      viewBox='0 0 100 100'
-      height={30}
-      width={30}
-    >
-      <path
-        d='M50 5 C60 15 75 25 85 35 C95 45 95 55 85 65 C75 75 60 85 50 95 C40 85 25 75 15 65 C5 55 5 45 15 35 C25 25 40 15 50 5 Z M50 35 A15 15 0 1 0 50 65 A15 15 0 1 0 50 35 Z'
-        fill='currentColor'
-      />
-    </svg>
-  );
+    <div className="w-6 h-6 [&>svg]:w-full [&>svg]:h-full bg-teal-400 rounded-full overflow-hidden">
+      <svg
+        width="218.75"
+        height="218.75"
+        aria-label="Amulets logo"
+        viewBox="0 0 57.878 57.878"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M28.939 0a28.939 28.939 0 1 0 28.939 28.939A28.94 28.94 0 0 0 28.938 0zm13.323 31.4L31.4 42.262a3.48 3.48 0 0 1-4.923 0L15.616 31.4a3.483 3.483 0 0 1 0-4.923l10.862-10.861a3.48 3.48 0 0 1 4.923 0l10.86 10.861a3.48 3.48 0 0 1 0 4.923z" />
+      </svg>
+    </div>
+  )
 }

@@ -13,7 +13,7 @@ const program = new Command()
 program
   .name('amulets')
   .description('Push, pull, and sync AI workflow assets — private by default')
-  .version('0.1.0')
+  .version('0.1.0', '-v, --version', 'output the version number')
 
 registerLogin(program)
 registerLogout(program)

@@ -39,7 +39,7 @@ export function clearConfig(): void {
 
 export function getApiUrl(): string {
   const config = readConfig()
-  return process.env.AMULETS_API_URL ?? config?.apiUrl ?? 'https://amulets.dev'
+  return process.env.AMULETS_API_URL ?? config?.apiUrl ?? 'https://www.amulets.dev'
 }
 
 // Returns a valid access token, refreshing via the web app if it expires within 60 seconds.
