@@ -69,7 +69,7 @@ export default function Home() {
       </section>
 
       {/* Value props */}
-      <section className="border-b">
+      <section>
         <Container className="p-0 border-x">
           <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x">
             {[
