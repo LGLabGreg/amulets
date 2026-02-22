@@ -61,7 +61,7 @@ export default async function DashboardPage() {
           </div>
         </div>
         <Link href="/new">
-          <Button size="sm">
+          <Button>
             <Plus />
             Add asset
           </Button>
