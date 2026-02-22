@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { CLIHelpSheet } from '@/components/cli-help-sheet'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
@@ -70,9 +71,7 @@ export default function Home() {
               <DashboardButton />
             </Suspense>
             <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
-            <Button variant="outline" className="font-mono">
-              amulets --help
-            </Button>
+            <CLIHelpSheet />
           </div>
         </Container>
       </section>
