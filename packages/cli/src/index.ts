@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
 import pkg from '../package.json'
+import { registerDelete } from './commands/delete.js'
 import { registerList } from './commands/list.js'
 import { registerLogin } from './commands/login.js'
 import { registerLogout } from './commands/logout.js'
@@ -26,6 +27,7 @@ registerWhoami(program)
 registerPush(program)
 registerPull(program)
 registerList(program)
+registerDelete(program)
 registerVersions(program)
 registerUpdate(program, version)
 
