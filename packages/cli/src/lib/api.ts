@@ -117,6 +117,25 @@ export async function getMe(token: string): Promise<{ username: string | null; i
   return request('/api/auth/me', { token })
 }
 
+export async function deleteAsset(owner: string, slug: string, token: string): Promise<void> {
+  const apiUrl = getApiUrl()
+  const res = await fetch(`${apiUrl}/api/assets/${owner}/${slug}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+  if (!res.ok) {
+    let message = `HTTP ${res.status}`
+    try {
+      const body = (await res.json()) as { error?: string }
+      if (body.error) message = body.error
+    } catch {
+      // ignore
+    }
+    throw new ApiError(res.status, message)
+  }
+}
+
 export async function listMyAssets(token: string): Promise<{
   assets: Array<
     Asset & { asset_versions: Array<{ id: string; version: string; created_at: string }> }
