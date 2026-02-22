@@ -1,7 +1,26 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
+
+export const experimental_ppr = true
+
+import { CLIHelpSheet } from '@/components/cli-help-sheet'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/utils/supabase/server'
+
+async function DashboardButton() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  return (
+    <Link href="/dashboard">
+      <Button>Go to dashboard</Button>
+    </Link>
+  )
+}
 
 const HOW_IT_WORKS = [
   {
@@ -27,6 +46,9 @@ const COMMANDS = [
   { cmd: 'pull <name>', desc: 'Pull your asset by name' },
   { cmd: 'list', desc: 'List your assets' },
   { cmd: 'versions <name>', desc: 'List all versions' },
+  { cmd: 'delete <slug>', desc: 'Delete an asset and all its versions' },
+  { cmd: 'whoami', desc: 'Show the current authenticated user' },
+  { cmd: 'logout', desc: 'Remove stored credentials' },
 ] as const
 
 export default function Home() {
@@ -43,11 +65,12 @@ export default function Home() {
             stays private — only you can access your library.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/dashboard">
-              <Button size="sm">Go to dashboard</Button>
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center gap-2">
+            <Suspense fallback={null}>
+              <DashboardButton />
+            </Suspense>
             <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
+            <CLIHelpSheet />
           </div>
         </Container>
       </section>
@@ -111,7 +134,7 @@ export default function Home() {
       {/* CLI Reference */}
       <section className="border-t">
         <Container className="p-0 border-x">
-          <div className="grid grid-cols-2 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-x">
             {COMMANDS.map(({ cmd, desc }) => (
               <div key={cmd} className="px-4 py-3 space-y-1">
                 <p className="font-mono text-xs font-semibold">{cmd}</p>

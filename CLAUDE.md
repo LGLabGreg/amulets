@@ -129,6 +129,41 @@ RLS is owner-only on all tables (`auth.uid() = owner_id`).
 /cli-auth             CLI authentication callback
 ```
 
+## Static Pages with Auth-Dependent UI
+
+Pages that are mostly static (e.g. `/`) must **not** call `supabase.auth.getUser()` at the page level — that opts the entire route out of static rendering and blocks the initial HTML.
+
+**Pattern:** extract auth-dependent UI into a small `async` server component, wrap it in `<Suspense>`. The static shell renders and streams immediately; the auth-gated content streams in separately.
+
+```tsx
+// ✅ Correct — page is static, button streams in
+async function DashboardButton() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  return <Link href="/dashboard"><Button>Go to dashboard</Button></Link>
+}
+
+export default function Page() {
+  return (
+    <>
+      <StaticContent />
+      <Suspense fallback={null}>
+        <DashboardButton />
+      </Suspense>
+    </>
+  )
+}
+
+// ❌ Wrong — makes the entire page dynamic
+export default async function Page() {
+  const { data: { user } } = await supabase.auth.getUser()
+  return <>{user && <Link href="/dashboard">...</Link>}</>
+}
+```
+
+The same rule applies to any component rendered in the root layout (e.g. `Header`) — auth-dependent parts are isolated in `HeaderAuth` wrapped in `<Suspense>`.
+
 ## API Route Pattern
 
 All API routes live in `apps/web/app/api/`. Every route uses the service role client and requires authentication via `getAuthUser(request)`. There is no anonymous/public read access.

@@ -15,12 +15,12 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
 
   return (
     <div className="relative overflow-hidden">
-      <Button variant="outline" size="sm" className="font-mono" onClick={handleCopy}>
+      <Button variant="outline" className="font-mono" onClick={handleCopy}>
         {label}
       </Button>
       <div
         className={`absolute right-0 top-0 h-full aspect-square bg-primary text-primary-foreground flex items-center justify-center transition-transform duration-200 ease-out ${
-          copied ? 'translate-x-0' : 'translate-x-full'
+          copied ? 'translate-x-0' : 'translate-x-[105%]'
         }`}
       >
         <Check className="size-3.5" />

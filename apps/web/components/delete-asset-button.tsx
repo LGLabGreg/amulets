@@ -28,7 +28,9 @@ export function DeleteAssetButton({ username, slug }: DeleteAssetButtonProps) {
     setPending(true)
     setError(null)
     try {
-      const res = await fetch(`/api/assets/${username}/${slug}`, { method: 'DELETE' })
+      const res = await fetch(`/api/assets/${username}/${slug}`, {
+        method: 'DELETE',
+      })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setError((body as { error?: string }).error ?? 'Delete failed')
@@ -45,7 +47,7 @@ export function DeleteAssetButton({ username, slug }: DeleteAssetButtonProps) {
 
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="destructive" size="sm" />}>Delete</DialogTrigger>
+      <DialogTrigger render={<Button variant="destructive" />}>Delete</DialogTrigger>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Delete {slug}?</DialogTitle>

@@ -29,6 +29,7 @@ amulets push <file-or-folder>     # push a file or skill/bundle folder
 amulets pull <name>               # pull by name (or owner/name)
 amulets list                      # list your assets
 amulets versions <name>           # list versions of an asset
+amulets delete <slug>             # delete an asset and all its versions
 amulets whoami                    # show current user
 amulets logout                    # remove stored credentials
 ```
