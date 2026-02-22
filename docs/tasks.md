@@ -141,7 +141,7 @@ See `docs/refactor-private-only.md` for full context and rationale.
 
 - [x] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
 - [x] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
-- [ ] **C3** End-to-end smoke test (manual, against prod):
+- [x] **C3** End-to-end smoke test (manual, against prod):
   1. `amulets login` → browser opens, GitHub OAuth completes, token saved
   2. `amulets push AGENTS.md -n test-agents -v 1.0.0` → succeeds with slug + version
   3. Create a folder with `SKILL.md` inside; `amulets push ./my-skill -n test-skill -v 1.0.0` → zip uploaded
@@ -158,7 +158,6 @@ See `docs/refactor-private-only.md` for full context and rationale.
 
 ### 9A — CLI
 
-- [ ] **D1** Make `--name` optional on push — default to filename (minus extension) or folder name
 - [ ] **D3** Auto-extract description from YAML frontmatter or first paragraph of markdown on push
 
 ### 9B — Web UI
@@ -170,6 +169,8 @@ See `docs/refactor-private-only.md` for full context and rationale.
 ### 9C — API & Database
 
 - [ ] **D6** Version list: sort by parsed semver rather than `created_at`
+- [ ] **D11** Verify that deleting an asset cascades correctly — DB record, asset versions, and storage zip all removed
+- [ ] **D12** Store the original relative path on push (e.g. `.agents/skills/dir`) so `amulets pull` restores to the same path by default
 - ~~**D7** Add `updated_at` column to `assets`~~ — covered by P1 migration in 7D
 - [ ] **D9** Add rate limiting on push endpoint (Vercel rate limiting or per-user throttle)
 - [ ] **D10** Add user record existence check on `GET /api/me/assets` and `GET /api/me/collections`
