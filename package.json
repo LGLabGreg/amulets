@@ -6,6 +6,7 @@
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build && pnpm --filter amulets-cli build",
     "build:cli": "pnpm --filter amulets-cli build",
+    "build:web": "pnpm --filter web build",
     "cli": "pnpm --filter amulets-cli build && node packages/cli/dist/index.js",
     "lint": "biome lint .",
     "format": "biome format --write .",
