@@ -1,8 +1,26 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/server'
+
+async function DashboardButton() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  return (
+    <Link href="/dashboard">
+      <Button>Go to dashboard</Button>
+    </Link>
+  )
+}
+
+// Note: any auth-dependent UI on static pages should follow this pattern —
+// extract into a small async server component and wrap in <Suspense> so
+// the static shell renders immediately and auth-gated content streams in.
 
 const HOW_IT_WORKS = [
   {
@@ -33,12 +51,7 @@ const COMMANDS = [
   { cmd: 'logout', desc: 'Remove stored credentials' },
 ] as const
 
-export default async function Home() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+export default function Home() {
   return (
     <div>
       {/* Hero */}
@@ -53,11 +66,9 @@ export default async function Home() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-2">
-            {user && (
-              <Link href="/dashboard">
-                <Button>Go to dashboard</Button>
-              </Link>
-            )}
+            <Suspense fallback={null}>
+              <DashboardButton />
+            </Suspense>
             <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
             <Button variant="outline" className="font-mono">
               amulets --help
