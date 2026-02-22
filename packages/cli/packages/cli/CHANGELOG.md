@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.3.1...amulets-cli-v0.4.0) (2026-02-22)
+
+
+### Features
+
+* **cli:** add delete command — amulets delete &lt;slug&gt; ([0d0cc4e](https://github.com/LGLabGreg/amulets/commit/0d0cc4e26c66b16fdde40af6df82b6a0eeeabb06))
+* **cli:** add delete command — amulets delete &lt;slug&gt; ([6ea28a8](https://github.com/LGLabGreg/amulets/commit/6ea28a8d0690ba57ec8be938b8a5abe8af3df093))
+
 ## [0.3.1](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.3.0...amulets-cli-v0.3.1) (2026-02-22)
 
 
