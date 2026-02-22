@@ -1,0 +1,9 @@
+{
+  "packages": {
+    "packages/cli": {
+      "release-type": "node",
+      "package-name": "amulets-cli",
+      "changelog-path": "packages/cli/CHANGELOG.md"
+    }
+  }
+}
