@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.3.0...amulets-cli-v0.3.1) (2026-02-22)
+
+
+### Bug Fixes
+
+* add repository field to cli package.json for npm provenance ([4590195](https://github.com/LGLabGreg/amulets/commit/45901953b547e2b4e24dd8aec07dcf7a62e4da10))
+* add repository field to cli package.json for npm provenance ([9aeb2da](https://github.com/LGLabGreg/amulets/commit/9aeb2da59bbd36ec763891b5513aa5da81b71209))
+
 ## [0.3.0](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.2.0...amulets-cli-v0.3.0) (2026-02-22)
 
 
