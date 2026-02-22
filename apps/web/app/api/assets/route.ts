@@ -1,6 +1,36 @@
 import { NextResponse } from 'next/server'
+import type { Json } from '@/lib/database.types'
 import { getAuthUser } from '@/utils/api-auth'
 import { createServiceClient } from '@/utils/supabase/service'
+
+const SLUG_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/
+const SEMVER_RE = /^\d+\.\d+\.\d+$/
+
+function validateSlug(slug: string): string | null {
+  if (!slug || !SLUG_RE.test(slug)) {
+    return 'slug must be lowercase alphanumeric with hyphens (e.g. my-skill)'
+  }
+  return null
+}
+
+function validateName(name: string): string | null {
+  if (!name || name.trim().length === 0) return 'name is required'
+  if (name.length > 100) return 'name must be 100 characters or fewer'
+  return null
+}
+
+function validateVersion(version: string): string | null {
+  if (version === 'latest') {
+    return '"latest" is a reserved version identifier'
+  }
+  if (!SEMVER_RE.test(version)) {
+    return 'version must be a valid semver string (e.g. 1.0.0)'
+  }
+  if (version.includes('/') || version.includes('\\') || version.includes('..')) {
+    return 'version contains invalid characters'
+  }
+  return null
+}
 
 export async function POST(request: Request) {
   const user = await getAuthUser(request)
@@ -30,6 +60,25 @@ export async function POST(request: Request) {
   return handleSimplePush(request, user.id)
 }
 
+async function checkRateLimit(ownerId: string): Promise<boolean> {
+  const service = createServiceClient()
+  const since = new Date(Date.now() - 60_000).toISOString()
+
+  const { data: recentAssets } = await service.from('assets').select('id').eq('owner_id', ownerId)
+
+  if (!recentAssets || recentAssets.length === 0) return false
+
+  const assetIds = recentAssets.map((a) => a.id)
+
+  const { count: recentCount } = await service
+    .from('asset_versions')
+    .select('id', { count: 'exact', head: true })
+    .in('asset_id', assetIds)
+    .gte('created_at', since)
+
+  return (recentCount ?? 0) > 10
+}
+
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
@@ -42,10 +91,20 @@ async function handleSimplePush(request: Request, ownerId: string) {
     )
   }
 
-  if (version === 'latest') {
+  const slugErr = validateSlug(slug)
+  if (slugErr) return NextResponse.json({ error: slugErr }, { status: 400 })
+
+  const nameErr = validateName(name)
+  if (nameErr) return NextResponse.json({ error: nameErr }, { status: 400 })
+
+  const versionErr = validateVersion(version)
+  if (versionErr) return NextResponse.json({ error: versionErr }, { status: 400 })
+
+  const rateLimited = await checkRateLimit(ownerId)
+  if (rateLimited) {
     return NextResponse.json(
-      { error: '"latest" is a reserved version identifier' },
-      { status: 400 },
+      { error: 'Rate limit exceeded — too many versions pushed in the last 60 seconds' },
+      { status: 429 },
     )
   }
 
@@ -101,9 +160,29 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  const { name, slug, description, asset_format, tags, version, message, filename } =
-    JSON.parse(metadataStr)
-  const file_manifest = JSON.parse(fileManifestStr)
+  let metadata: Record<string, unknown>
+  let file_manifest: Json
+  try {
+    metadata = JSON.parse(metadataStr)
+  } catch {
+    return NextResponse.json({ error: 'Invalid metadata JSON' }, { status: 400 })
+  }
+  try {
+    file_manifest = JSON.parse(fileManifestStr)
+  } catch {
+    return NextResponse.json({ error: 'Invalid file_manifest JSON' }, { status: 400 })
+  }
+
+  const { name, slug, description, asset_format, tags, version, message, filename } = metadata as {
+    name?: string
+    slug?: string
+    description?: string
+    asset_format?: string
+    tags?: string[]
+    version?: string
+    message?: string
+    filename?: string
+  }
 
   if (!name || !slug || !version || !filename) {
     return NextResponse.json(
@@ -112,17 +191,27 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  if (version === 'latest') {
-    return NextResponse.json(
-      { error: '"latest" is a reserved version identifier' },
-      { status: 400 },
-    )
-  }
+  const slugErr = validateSlug(slug)
+  if (slugErr) return NextResponse.json({ error: slugErr }, { status: 400 })
+
+  const nameErr = validateName(name)
+  if (nameErr) return NextResponse.json({ error: nameErr }, { status: 400 })
+
+  const versionErr = validateVersion(version)
+  if (versionErr) return NextResponse.json({ error: versionErr }, { status: 400 })
 
   if (!asset_format || !['skill', 'bundle'].includes(asset_format)) {
     return NextResponse.json(
       { error: 'asset_format must be "skill" or "bundle" for directory pushes' },
       { status: 400 },
+    )
+  }
+
+  const rateLimited = await checkRateLimit(ownerId)
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — too many versions pushed in the last 60 seconds' },
+      { status: 429 },
     )
   }
 
