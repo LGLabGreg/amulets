@@ -19,10 +19,6 @@ async function DashboardButton() {
   )
 }
 
-// Note: any auth-dependent UI on static pages should follow this pattern —
-// extract into a small async server component and wrap in <Suspense> so
-// the static shell renders immediately and auth-gated content streams in.
-
 const HOW_IT_WORKS = [
   {
     step: '1',
