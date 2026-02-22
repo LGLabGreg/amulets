@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
+
+export const experimental_ppr = true
+
 import { CLIHelpSheet } from '@/components/cli-help-sheet'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
