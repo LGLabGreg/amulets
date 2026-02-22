@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
-  const { name, slug, description, tags, version, message, content, is_public } = body
+  const { name, slug, description, tags, version, message, content } = body
 
   if (!name || !slug || !version || !content) {
     return NextResponse.json(
@@ -59,7 +59,6 @@ async function handleSimplePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format: 'file',
         tags: tags ?? [],
-        is_public: is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -101,8 +100,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  const { name, slug, description, asset_format, tags, version, message, is_public } =
-    JSON.parse(metadataStr)
+  const { name, slug, description, asset_format, tags, version, message } = JSON.parse(metadataStr)
   const file_manifest = JSON.parse(fileManifestStr)
 
   if (!name || !slug || !version) {
@@ -126,13 +124,6 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  if (is_public === true) {
-    return NextResponse.json(
-      { error: 'Skill and bundle assets cannot be made public' },
-      { status: 400 },
-    )
-  }
-
   const { data: asset, error: assetError } = await service
     .from('assets')
     .upsert(
@@ -143,7 +134,6 @@ async function handlePackagePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format,
         tags: tags ?? [],
-        is_public: is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )

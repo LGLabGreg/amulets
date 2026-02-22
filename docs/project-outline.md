@@ -1,34 +1,34 @@
 # Amulet — Project Outline
 
-> A version-controlled registry for AI workflow assets: prompts, skills, cursorrules, agent configs, and anything markdown — including full skill packages conforming to the agentskills.io spec.
+> A private skill management platform for AI workflow assets: prompts, skills, `.cursorrules`, `AGENTS.md`, and skill packages conforming to the agentskills.io spec.
 
 ---
 
 ## The Problem
 
-AI-assisted development relies on markdown assets — skills, prompts, `.cursorrules`, `AGENTS.md` files, system instructions — that are currently scattered across repos, Notion pages, and local folders. There's no standard way to version, share, or pull these assets into a project, so developers either recreate them from scratch or copy-paste from old repos.
+AI-assisted development relies on markdown assets — skills, prompts, `.cursorrules`, `AGENTS.md` files, system instructions — that are currently scattered across repos, Notion pages, and local folders. There's no standard way to version, organise, and pull these assets into a project, so developers either recreate them from scratch or copy-paste from old repos.
 
-Skill packages add another layer of complexity: a skill isn't just a single file, it's a folder (`SKILL.md` + optional scripts, references, assets) that needs to be bundled, versioned, and unpacked correctly.
+Public discovery is already handled by the open ecosystem (`npx skills add`, GitHub repos, shadcn-style CLIs). What's missing is the **private layer**: how do developers store, version, and sync their own customised assets across projects and machines?
 
 ---
 
 ## The Solution
 
-A CLI-first registry where developers push markdown assets and skill packages, version them, organise them into collections, and pull them into any project with a single command.
+A CLI-first tool where developers push their private markdown assets and skill packages, version them, and pull them into any project with a single command.
 
 ```bash
-# Push a single file asset
-amulet push ./prompts/refactor.md --name refactor-prompt
+# Push a skill
+amulets push AGENTS.md -n agents
 
-# Push a skill package (folder with SKILL.md — auto-detected)
-amulet push ./skills/docx/ --name docx-skill --tags claude,claude-code
+# Push a whole skill package
+amulets push ./skills/docx/ -n docx-skill
 
-# Pull a single asset
-amulet pull docx-skill --output ./skills/
-
-# Pull a whole collection
-amulet pull my-nextjs-stack --output ./
+# Pull into any project
+amulets pull agents
+amulets pull docx-skill --output ./skills/
 ```
+
+**Positioning:** "npx skills is how you discover public skills. Amulet is how you manage your private ones."
 
 ---
 
@@ -41,7 +41,7 @@ Amulet handles three distinct asset formats:
 A single markdown file. Used for prompts, `.cursorrules`, `AGENTS.md`, `CLAUDE.md`, system instructions, and any standalone text.
 
 ```
-refactor-prompt.md
+my-prompt.md
 ```
 
 ### skill
@@ -50,19 +50,10 @@ A folder conforming to the [agentskills.io](https://agentskills.io) open spec. M
 
 ```
 docx-skill/
-├── SKILL.md          # Required: YAML frontmatter (name, description) + instructions
+├── SKILL.md          # Required: YAML frontmatter + instructions
 ├── scripts/          # Optional: executable code the skill calls
 ├── references/       # Optional: supplementary documentation
 └── assets/           # Optional: templates, resources
-```
-
-`SKILL.md` frontmatter format:
-
-```yaml
----
-name: docx-processing
-description: Create and edit Word documents with formatting, tables, and images.
----
 ```
 
 ### bundle
@@ -83,7 +74,7 @@ Any other directory without a `SKILL.md`. Used for cursor rules sets, windsurf r
 
 - Solo developers using Claude Code, Cursor, Codex, or other AI coding agents
 - Anyone maintaining a `skills/`, `prompts/`, or `.cursorrules` folder across multiple projects
-- Teams wanting a shared, versioned source of truth for agent context files
+- Teams wanting a shared, versioned source of truth for private agent context files
 
 ---
 
@@ -91,24 +82,23 @@ Any other directory without a `SKILL.md`. Used for cursor rules sets, windsurf r
 
 ### Must Have
 
-- [ ] CLI: `push`, `pull`, `list`, `search` commands
-- [ ] Both simple assets (single file) and skill packages (folder) supported
-- [ ] Auto-detection of asset format on push
-- [ ] Asset versioning with full history and diffs (text diff for simple assets, file tree diff for packages)
+- [x] CLI: `push`, `pull`, `list`, `versions` commands
+- [x] Both simple assets (single file) and skill/bundle packages (folder) supported
+- [x] Auto-detection of asset format on push
+- [x] Asset versioning with full history
+- [x] GitHub OAuth (no email/password)
+- [x] All assets private by default — only the owner can access them
+- [x] Web UI: dashboard (your assets), asset detail (version history, content, pull command), push via form
 - [ ] Collections (named groups of assets pinned to specific versions)
-- [ ] GitHub OAuth (no email/password)
-- [ ] Public assets only (no private in v1)
-- [ ] Web UI: browse, search, view asset + version history, file tree for skill packages, copy pull command
-- [ ] Asset type tags: `skill`, `prompt`, `cursorrules`, `agentsmd`, `config`
+- [ ] `.amuletrc` + `amulets sync` (pull all pinned assets into a project in one command)
 
-### Explicitly Out of Scope (v1)
+### Out of Scope (v1)
 
-- Private assets
-- Teams / orgs
-- Payments
+- Public asset registry or browsing
+- Teams / orgs (Phase 2)
+- Payments (Phase 2)
 - Web-based editor
 - Comments or ratings
-- Webhook integrations
 - Asset dependencies
 
 ---
@@ -120,77 +110,83 @@ User
   id, github_id, username, avatar_url, created_at
 
 Asset
-  id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], is_public, created_at
+  id, owner_id, name, slug, description
+  asset_format (file|skill|bundle)
+  tags[]
+  created_at, updated_at
 
 AssetVersion
   id, asset_id, version (semver), message, created_at
-  content (text, nullable)          -- populated for simple assets
-  storage_path (text, nullable)     -- path to zip in Supabase Storage, for skill packages
+  content (text, nullable)          -- populated for file assets
+  storage_path (text, nullable)     -- path to zip in Supabase Storage, for skill/bundle
   file_manifest (jsonb, nullable)   -- list of files in the package for web UI display
 
 Collection
-  id, owner_id, name, slug, description, is_public, created_at
+  id, owner_id, name, slug, description, created_at
 
 CollectionItem
   id, collection_id, asset_id, pinned_version_id, order
 ```
 
-Skill packages are stored as zip files in Supabase Storage. The `file_manifest` column stores a JSON array of file paths and sizes so the web UI can render a file tree without unzipping.
+**RLS:** All tables use owner-only RLS (`auth.uid() = owner_id`). There is no public read access. Future team support will extend policies to include team membership.
+
+Skill and bundle packages are stored as zip files in Supabase Storage. The `file_manifest` column stores a JSON array of file paths and sizes so the web UI can render a file tree without unzipping.
 
 ---
 
 ## CLI Design
 
-Package: `amulet-cli` (or `@amulet-dev/cli` if name is taken on npm)
+Package: `amulets-cli` on npm
 
 ### Commands
 
 ```bash
 # Auth
-amulet login                          # OAuth via browser
-amulet logout
-amulet whoami
+amulets login                           # OAuth via browser
+amulets logout
+amulets whoami
 
 # Assets
-amulet push <file-or-folder> [options]
-  --name     asset name/slug
-  --message  "version message"
-  --tags     comma-separated tags
-  # format auto-detected: file = file, folder with SKILL.md = skill, folder without = bundle
+amulets push <file-or-folder> [options]
+  -n, --name <name>          asset name (prompted if omitted)
+  -v, --version <ver>        semver version [default: 1.0.0]
+  -m, --message <msg>        version message
+  -t, --tags <tags>          comma-separated tags
+  -d, --description <desc>   short description
 
-amulet pull <owner/name>              # pull asset into current dir
-  --output   ./path/to/output/        # for packages, unpacks folder here
-  --version  1.2.0                    # pin to specific version
+amulets pull <name>                     # pull your asset (name or owner/name)
+  -o, --output <path>        output file or directory
+  -v, --version <ver>        pin to version [default: latest]
 
-amulet list                           # list your assets
-amulet search <query>                 # search public registry
-amulet diff <owner/name> <v1> <v2>   # diff two versions
-amulet versions <owner/name>         # list versions of an asset
-amulet inspect <owner/name>          # show file tree for a skill package
+amulets list                            # list your assets
+amulets versions <owner/name>           # list versions of an asset
 
-# Collections
-amulet collection create <name>
-amulet collection add <name> <owner/asset>[@version]
-amulet collection pull <name> --output ./
+# Future
+amulets inspect <owner/name>            # show file tree for a skill/bundle
+amulets diff <owner/name> <v1> <v2>    # diff two versions
 
-# Config (local .amuletrc)
-amulet init                           # create .amuletrc in project root
-amulet sync                           # pull all assets/collections in .amuletrc
+# Collections (Phase 2)
+amulets collection create <name>
+amulets collection add <name> <owner/asset>[@version]
+amulets collection pull <name> --output ./
+
+# Config (Phase 2)
+amulets init                            # create .amuletrc in project root
+amulets sync                            # pull all assets defined in .amuletrc
 ```
 
-### `.amuletrc` (local project config)
+### `.amuletrc` (Phase 2)
 
 ```json
 {
-  "collections": ["lglab/nextjs-supabase-stack"],
   "assets": [
-    { "name": "lglab/docx-skill", "output": "./skills/docx/" },
-    { "name": "lglab/cursorrules-react", "output": ".cursorrules" }
+    { "name": "myuser/docx-skill", "output": "./skills/docx/" },
+    { "name": "myuser/agents", "output": "./.claude/agents.md" }
   ]
 }
 ```
 
-`amulet sync` pulls everything defined in `.amuletrc` at pinned versions. Note that skill packages specify a folder as `output`, while simple assets specify a file path.
+`amulets sync` pulls everything defined in `.amuletrc` at pinned versions.
 
 ---
 
@@ -198,31 +194,28 @@ amulet sync                           # pull all assets/collections in .amuletrc
 
 ### Backend / API
 
-- **Next.js 15** (App Router) — API routes for everything, keeps it simple
+- **Next.js 16** (App Router) — API routes for everything
 - **Supabase** — Auth (GitHub OAuth), Postgres, Row Level Security
-- **Supabase Storage** — stores skill package zips; simple asset content stored as text in DB
+- **Supabase Storage** — stores skill/bundle package zips; file asset content stored as text in DB
 
 ### Frontend
 
-- **Next.js 15** — same repo, server components
+- **Next.js 16** — same repo, server components by default
 - **Tailwind CSS** — styling
-- **Shadcn/ui** — components
-- **Shiki** — markdown/code syntax highlighting in version diffs
-- **File tree component** — for rendering skill package structure in the web UI
+- **Shadcn/ui** (base-lyra style, Base UI primitives)
+- **Shiki** — markdown/code syntax highlighting
 
 ### CLI
 
-- **TypeScript**
-- **Commander.js** — CLI argument parsing
+- **TypeScript** + **Commander.js**
 - **archiver / unzipper** — zip/unzip skill packages
 - **ora** — spinner for upload/download progress
-- **node-fetch** — API calls to backend
-- Published to npm as `amulet-cli` or scoped `@amulet-dev/cli` (check availability early)
+- Published to npm as `amulets-cli`
 
 ### Infrastructure
 
-- **Vercel** — hosting (free tier to start)
-- **Supabase** — free tier covers MVP comfortably (500MB storage for packages)
+- **Vercel** — hosting
+- **Supabase** — free tier covers MVP
 - **GitHub OAuth App** — auth provider
 
 ### Dev Tooling
@@ -235,118 +228,92 @@ amulet sync                           # pull all assets/collections in .amuletrc
 
 ## API Routes
 
+All routes require authentication. No anonymous access.
+
 ```
-POST   /api/assets                          push new asset or new version
-                                            multipart/form-data: supports both text and zip
-GET    /api/assets/:owner/:name             get asset metadata + latest version
-GET    /api/assets/:owner/:name/versions    list all versions
-GET    /api/assets/:owner/:name/:version    get version (text or signed download URL for zip)
-GET    /api/assets/search?q=&tags=&format=
-POST   /api/collections
-GET    /api/collections/:owner/:name
-POST   /api/collections/:owner/:name/items
+POST   /api/assets                          push asset (file or skill/bundle)
+GET    /api/assets/:owner/:name             asset metadata + versions (auth + ownership)
+GET    /api/assets/:owner/:name/versions    list versions (auth + ownership)
+GET    /api/assets/:owner/:name/:version    version content or signed download URL (auth + ownership)
+DELETE /api/assets/:owner/:name             delete asset (auth + ownership)
+
+POST   /api/collections                     create collection
+GET    /api/collections/:owner/:name        collection detail + items
+POST   /api/collections/:owner/:name/items  add asset to collection
 DELETE /api/collections/:owner/:name/items/:id
-GET    /api/me/assets
-GET    /api/me/collections
+
+GET    /api/me/assets                       list authenticated user's assets
+GET    /api/me/collections                  list authenticated user's collections
+POST   /api/auth/me                         get current user from token
+POST   /api/auth/refresh                    refresh token
 ```
 
-For skill package pulls, the API returns a signed Supabase Storage URL. The CLI downloads and unzips directly — no proxying large files through the Next.js server.
+For skill/bundle pulls, the API returns a signed Supabase Storage URL. The CLI downloads and unzips directly — no proxying large files through the Next.js server.
 
 ---
 
-## Web UI Pages
+## Web App Routes
 
-| Route                       | Description                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `/`                         | Landing page + search                                                                                                     |
-| `/explore`                  | Browse public assets, filter by type/tag/format                                                                           |
-| `/:owner`                   | User profile, their public assets and collections                                                                         |
-| `/:owner/:name`             | Asset detail: for simple assets shows rendered markdown + diffs; for skill packages shows `SKILL.md` rendered + file tree |
-| `/:owner/:name/:version`    | Specific version with diff vs previous                                                                                    |
-| `/collections/:owner/:name` | Collection detail + CLI pull command                                                                                      |
-| `/dashboard`                | Your assets and collections (authed)                                                                                      |
-| `/new`                      | Push asset via web form (authed) — supports file upload or folder zip upload                                              |
+| Route | Auth | Description |
+|-------|------|-------------|
+| `/` | No | Landing/marketing page with login CTA |
+| `/dashboard` | Yes | Your skills library — all assets, stats, links to detail |
+| `/dashboard/:slug` | Yes | Asset detail: version history, content render, pull command |
+| `/new` | Yes | Push a file asset via web form |
+| `/cli-auth` | No | CLI OAuth callback |
 
 ---
 
 ## Roadmap
 
-### Phase 1 — Core Loop (Week 1–2)
+### Phase 1 — Core Loop (complete)
 
 - Supabase project setup, schema, GitHub OAuth, Storage bucket
-- API routes: push (both formats), pull, list, versions
-- CLI: login, push (with auto-detection), pull (with unpack), list
-- Minimal web UI: explore + asset detail page with file tree for packages
-- Deploy to Vercel
+- API routes: push (file + skill/bundle), pull, list, versions
+- CLI: login, push (auto-detection), pull (with unpack), list, versions
+- Web UI: dashboard + asset detail + /new form
+- Private-only architecture (owner-only RLS, no public registry)
 
-**Goal:** Push your own Claude Code skill packages and pull them into another project.
+**Goal:** Push your own assets and pull them into another project.
 
-### Phase 2 — Usability (Week 3–4)
+### Phase 2 — Sync (next)
 
 - Collections: create, add assets, pull whole collection
-- `.amuletrc` + `amulet sync`
-- Version diffs in web UI (text diff for simple assets, file tree diff for packages)
-- Search by tag, type, and format
-- User profile pages
-- `amulet inspect` command for browsing package contents before pulling
+- `.amuletrc` + `amulets sync`
+- Version diff view in web UI
+- `amulets inspect` command for browsing package contents before pulling
+- Deploy to Vercel + publish CLI to npm
 
-**Goal:** 10 people using CLI to pull an asset into a real project.
+**Goal:** Define a project's asset dependencies in `.amuletrc`, run `amulets sync`, done.
 
-### Phase 3 — Growth (Month 2)
+### Phase 3 — Teams
 
-- Seed the registry with high-quality public skill packages (docx, pdf, pptx, xlsx, frontend-design) and `.cursorrules` for common stacks
-- Write a blog post / post on X showing the workflow
-- Accept community submissions / featured assets
-- Asset ratings (thumbs up only, keep it simple)
-- Web editor for simple assets (edit and push a new version without CLI)
+The private-only model makes teams the natural paid upgrade:
 
-### Phase 4 — Monetisation (Month 3)
+- Team namespace (e.g. `@myteam/skill-name`)
+- Shared private assets visible to all team members
+- Role-based access (admin, member)
+- Team dashboard
 
-- Private assets (both formats) — **$12/mo Personal**
-- Private collections — included in Personal
-- Teams (shared private assets, org namespace) — **$40/mo Team**
-- Stripe Billing via Supabase + Stripe integration
-- Usage limits on free tier (e.g. 10 public assets, 100MB package storage)
+| Tier | Price | Includes |
+|------|-------|----------|
+| Free | $0 | 10 skills, 100MB storage, single user |
+| Pro | $9/mo | Unlimited skills, 1GB storage, `.amuletrc` sync |
+| Team | $29/mo | Shared namespace, 5 seats, 5GB, role-based access |
 
-### Phase 5 — Ecosystem (Month 4+)
+### Phase 4 — Ecosystem
 
 - VS Code extension — browse and pull assets from within editor
 - Claude Code MCP server — pull amulet assets directly from agent context
 - Asset dependencies (a skill package can declare dependencies on other packages)
-- Verified publisher badges
-- GitHub Action: `amulet sync` on PR to keep team assets up to date
-- agentskills.io spec compliance badge shown on qualifying skill packages
-
----
-
-## Pricing (when ready)
-
-| Tier       | Price  | Limits                                                   |
-| ---------- | ------ | -------------------------------------------------------- |
-| Free       | $0     | 10 public assets, unlimited pulls, 100MB package storage |
-| Personal   | $12/mo | Unlimited private assets + collections, 1GB storage      |
-| Team       | $40/mo | Org namespace, team sharing, 5 seats, 5GB storage        |
-| Enterprise | Custom | SSO, audit logs, SLA                                     |
+- GitHub Action: `amulets sync` on PR to keep team assets up to date
 
 ---
 
 ## Risks & Mitigations
 
-| Risk                                   | Mitigation                                                                               |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Name conflict on npm / domain          | Check early, have alternates ready (Grimoire, Graft, Quill)                              |
-| Low initial content = low value        | Seed with your own high-quality skill packages before launch                             |
-| GitHub already does this (Gist)        | Gists can't handle folder packages, versioning, or the CLI pull workflow                 |
-| OpenAI / Anthropic build this natively | Focus on multi-tool, multi-model positioning early; agentskills.io spec is tool-agnostic |
-| Zip storage costs at scale             | Simple assets are text, packages are typically <1MB; Supabase Storage is cheap           |
-
----
-
-## First Actions
-
-1. Register `amulets.dev` (primary) and `amulet.sh` (CLI alias/redirect) — both confirmed available
-2. Check npm for `amulet-cli` name availability
-3. Spin up Supabase project + create schema + Storage bucket
-4. Scaffold pnpm monorepo: `apps/web` + `packages/cli`
-5. Build push/pull CLI loop locally — test with a real skill package from `/mnt/skills/public/docx/`
-6. Deploy to Vercel and publish your first real skill package to the registry
+| Risk | Mitigation |
+|------|------------|
+| "Just use a private GitHub repo" | Amulets adds versioning, a pull CLI, and future team sharing without needing a full repo per asset |
+| OpenAI / Anthropic build this natively | Focus on multi-tool, multi-model positioning; agentskills.io spec is tool-agnostic |
+| Zip storage costs at scale | Simple assets are text; packages are typically <1MB; Supabase Storage is cheap |

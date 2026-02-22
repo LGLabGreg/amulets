@@ -1,8 +1,6 @@
-import { Compass } from 'lucide-react'
 import Link from 'next/link'
 import { signInWithGitHub } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { createClient } from '@/utils/supabase/server'
 import Logo from './logo'
 import { ThemeToggle } from './theme-toggle'
@@ -29,21 +27,6 @@ export default async function Header() {
         </Link>
 
         <nav className="ml-auto flex items-center gap-2">
-          <form action="/explore" className="hidden md:flex flex-1 max-w-sm">
-            <Input name="q" placeholder="Search amulets…" className="h-8" />
-          </form>
-
-          <Button
-            nativeButton={false}
-            variant="outline"
-            className="w-8 px-0 md:w-auto md:px-2.5"
-            render={
-              <Link href="/explore">
-                <Compass />
-                <span className="hidden md:inline-flex">Explore</span>
-              </Link>
-            }
-          />
           <ThemeToggle />
 
           {user ? (
@@ -56,11 +39,6 @@ export default async function Header() {
             </form>
           )}
         </nav>
-      </div>
-      <div className="md:hidden px-4 pb-2">
-        <form action="/explore" className="flex flex-1">
-          <Input name="q" placeholder="Search amulets…" className="h-8" />
-        </form>
       </div>
     </header>
   )

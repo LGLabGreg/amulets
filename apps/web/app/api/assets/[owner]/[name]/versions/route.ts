@@ -10,6 +10,9 @@ export async function GET(
   const service = createServiceClient()
 
   const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const { data: userRecord } = await service
     .from('users')
@@ -17,24 +20,18 @@ export async function GET(
     .eq('username', owner)
     .single()
 
-  if (!userRecord) {
+  if (!userRecord || userRecord.id !== user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   const { data: asset } = await service
     .from('assets')
-    .select('id, is_public')
-    .eq('owner_id', userRecord.id)
+    .select('id')
+    .eq('owner_id', user.id)
     .eq('slug', name)
     .single()
 
   if (!asset) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
-
-  const isOwner = user?.id === userRecord.id
-
-  if (!asset.is_public && !isOwner) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 

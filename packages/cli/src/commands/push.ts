@@ -25,46 +25,6 @@ async function promptName(suggestion: string): Promise<string> {
   }
 }
 
-async function promptPublicMeta(provided: {
-  description?: string
-  message?: string
-  tags?: string
-}): Promise<{ description?: string; message?: string; tags: string[] }> {
-  const rl = createInterface({ input: process.stdin, output: process.stdout })
-  try {
-    let description = provided.description
-    if (description === undefined) {
-      const answer = await rl.question('? Description › ')
-      description = answer.trim() || undefined
-    }
-
-    let message = provided.message
-    if (message === undefined) {
-      const answer = await rl.question('? Version message › ')
-      message = answer.trim() || undefined
-    }
-
-    let tagsRaw = provided.tags
-    if (tagsRaw === undefined) {
-      const answer = await rl.question('? Tags (comma-separated) › ')
-      tagsRaw = answer.trim() || undefined
-    }
-
-    return {
-      description,
-      message,
-      tags: tagsRaw
-        ? tagsRaw
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : [],
-    }
-  } finally {
-    rl.close()
-  }
-}
-
 function toSlug(name: string): string {
   return name
     .toLowerCase()
@@ -129,7 +89,6 @@ function friendlyPushError(err: unknown, version: string, slug: string): string 
 
   if (status === 401) return 'Not authenticated. Run `amulets login` first.'
   if (status === 413) return 'Package exceeds the 4 MB size limit.'
-  if (message.includes('cannot be made public')) return message
   if (
     status === 409 ||
     message.includes('duplicate key') ||
@@ -149,7 +108,6 @@ export function registerPush(program: Command): void {
     .command('push <path>')
     .description('Push an asset (file or skill/bundle folder) to the registry')
     .option('-n, --name <name>', 'Asset name')
-    .option('-p, --public', 'Make this asset publicly visible')
     .option('-v, --version <version>', 'Version (semver)', '1.0.0')
     .option('-m, --message <message>', 'Version message')
     .option('-t, --tags <tags>', 'Comma-separated tags (e.g. claude,prompt)')
@@ -159,7 +117,6 @@ export function registerPush(program: Command): void {
         assetPath: string,
         options: {
           name?: string
-          public?: boolean
           version: string
           message?: string
           tags?: string
@@ -167,7 +124,6 @@ export function registerPush(program: Command): void {
         },
       ) => {
         const token = await requireToken()
-        const isPublic = options.public === true
         const resolvedPath = path.resolve(assetPath)
 
         if (!fs.existsSync(resolvedPath)) {
@@ -191,30 +147,12 @@ export function registerPush(program: Command): void {
         }
 
         const slug = toSlug(name)
-
-        if (isPublic && format !== 'file') {
-          console.error(
-            `Error: only file assets can be made public. Skill and bundle packages are always private.`,
-          )
-          process.exit(1)
-        }
-
-        const publicMeta = isPublic
-          ? await promptPublicMeta({
-              description: options.description,
-              message: options.message,
-              tags: options.tags,
-            })
-          : {
-              description: options.description,
-              message: options.message,
-              tags: options.tags
-                ? options.tags
-                    .split(',')
-                    .map((t) => t.trim())
-                    .filter(Boolean)
-                : [],
-            }
+        const tags = options.tags
+          ? options.tags
+              .split(',')
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : []
 
         const spinner = ora('Pushing asset...').start()
 
@@ -233,12 +171,11 @@ export function registerPush(program: Command): void {
               JSON.stringify({
                 name,
                 slug,
-                description: publicMeta.description,
+                description: options.description,
                 asset_format: format,
-                tags: publicMeta.tags,
+                tags,
                 version: options.version,
-                message: publicMeta.message,
-                is_public: isPublic,
+                message: options.message,
               }),
             )
             formData.append('file_manifest', JSON.stringify(fileManifest))
@@ -253,10 +190,7 @@ export function registerPush(program: Command): void {
             )
 
             const result = await pushPackageAsset(token, formData)
-            const visibility = isPublic ? 'public' : 'private'
-            spinner.succeed(
-              `Pushed ${visibility} ${format}: ${result.asset.slug} @ ${result.version.version}`,
-            )
+            spinner.succeed(`Pushed ${format}: ${result.asset.slug} @ ${result.version.version}`)
           } else {
             // Simple asset (single file)
             spinner.text = 'Reading file...'
@@ -266,17 +200,13 @@ export function registerPush(program: Command): void {
             const result = await pushSimpleAsset(token, {
               name,
               slug,
-              description: publicMeta.description,
-              tags: publicMeta.tags,
+              description: options.description,
+              tags,
               version: options.version,
-              message: publicMeta.message,
+              message: options.message,
               content,
-              is_public: isPublic,
             })
-            const visibility = isPublic ? 'public' : 'private'
-            spinner.succeed(
-              `Pushed ${visibility} file: ${result.asset.slug} @ ${result.version.version}`,
-            )
+            spinner.succeed(`Pushed file: ${result.asset.slug} @ ${result.version.version}`)
           }
         } catch (err) {
           spinner.fail(`Push failed: ${friendlyPushError(err, options.version, slug)}`)

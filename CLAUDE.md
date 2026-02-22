@@ -2,14 +2,17 @@
 
 ## Project Overview
 
-A CLI-first registry for AI workflow assets (prompts, skills, `.cursorrules`, `AGENTS.md`).
-"Your AI workflows, everywhere." Domain: `amulets.dev`
+A CLI-first **private** skill management platform for AI workflow assets (prompts, skills, `.cursorrules`, `AGENTS.md`).
+"Your private AI skills library." Domain: `amulets.dev`
+
+**Positioning:** "npx skills is how you discover public skills. Amulet is how you manage your private ones."
+All assets are private by default — only the owner can access them. No public registry, no public browsing.
 
 ## Monorepo Structure
 
 ```
 apps/
-  web/          # Next.js 15 App Router — web UI + API routes
+  web/          # Next.js 16 App Router — web UI + API routes
 packages/
   cli/          # TypeScript CLI, published to npm as amulets-cli
 docs/
@@ -82,9 +85,11 @@ CLI reads from `~/.config/amulets/config.json` (written by `amulets login`).
 
 ## Key Architectural Decisions
 
+- **All assets are private** — only the owner can read, write, or pull their assets. No public access.
+- **All API routes require authentication** — use `getAuthUser(request)` at the top of every route; return 401 if missing.
 - **Simple assets** (single `.md` file): content stored as text in `AssetVersion.content`
-- **Skill packages** (folder with `SKILL.md`): zipped and stored in Supabase Storage; `file_manifest` JSONB column holds file tree for UI rendering without unzipping
-- **API large file handling**: for skill package pulls, API returns a signed Supabase Storage URL — CLI downloads directly from storage, not proxied through Next.js
+- **Skill/bundle packages** (folder): zipped and stored in Supabase Storage; `file_manifest` JSONB column holds file tree for UI rendering without unzipping
+- **API large file handling**: for skill/bundle pulls, API returns a signed Supabase Storage URL — CLI downloads directly from storage, not proxied through Next.js
 - **Auth**: GitHub OAuth via Supabase Auth. CLI uses a browser-based OAuth flow, stores access token locally.
 
 ## Three Asset Formats
@@ -105,16 +110,28 @@ The `type` column has been removed. Use `tags` for categorisation instead.
 ## Data Model (key tables)
 
 ```
-User:          id, github_id, username, avatar_url, created_at
-Asset:         id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], is_public
-AssetVersion:  id, asset_id, version (semver), message, content (nullable), storage_path (nullable), file_manifest (jsonb), created_at
-Collection:    id, owner_id, name, slug, description, is_public
+User:           id, github_id, username, avatar_url, created_at
+Asset:          id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], created_at, updated_at
+AssetVersion:   id, asset_id, version (semver), message, content (nullable), storage_path (nullable), file_manifest (jsonb), created_at
+Collection:     id, owner_id, name, slug, description, created_at
 CollectionItem: id, collection_id, asset_id, pinned_version_id, order
+```
+
+RLS is owner-only on all tables (`auth.uid() = owner_id`).
+
+## Web App Routes
+
+```
+/                     Landing/marketing page (unauthenticated)
+/dashboard            Your skills library (authenticated)
+/dashboard/:slug      Asset detail view (authenticated, owner-only)
+/new                  Push asset via web form (authenticated)
+/cli-auth             CLI authentication callback
 ```
 
 ## API Route Pattern
 
-All API routes live in `apps/web/app/api/`. Use Supabase service role client for mutations, anon client for public reads.
+All API routes live in `apps/web/app/api/`. Every route uses the service role client and requires authentication via `getAuthUser(request)`. There is no anonymous/public read access.
 
 ## Shadcn/UI Rules
 

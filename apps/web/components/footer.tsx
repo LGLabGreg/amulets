@@ -8,8 +8,8 @@ export default function Footer() {
           amulets
         </Link>
         <div className="flex gap-4">
-          <Link href="/explore" className="hover:text-foreground">
-            Explore
+          <Link href="/dashboard" className="hover:text-foreground">
+            Dashboard
           </Link>
           <a
             href="https://github.com"

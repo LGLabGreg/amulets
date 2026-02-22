@@ -7,8 +7,8 @@ export interface Asset {
   description: string | null
   asset_format: 'file' | 'skill' | 'bundle'
   tags: string[]
-  is_public: boolean
   created_at: string
+  updated_at: string
 }
 
 export interface AssetVersion {
@@ -65,7 +65,6 @@ export async function pushSimpleAsset(
     version: string
     message?: string
     content: string
-    is_public?: boolean
   },
 ): Promise<{ asset: Asset; version: AssetVersion }> {
   return request('/api/assets', {
@@ -92,21 +91,13 @@ export async function getAssetVersion(
   name: string,
   version: string,
   token: string,
-  extraHeaders?: Record<string, string>,
 ): Promise<{
   version: string
   content?: string
   download_url?: string
   file_manifest?: unknown
-  message?: string
-  created_at?: string
-  asset_format?: string
-  review_url?: string
 }> {
-  return request(`/api/assets/${owner}/${name}/${version}`, {
-    token,
-    headers: extraHeaders,
-  })
+  return request(`/api/assets/${owner}/${name}/${version}`, { token })
 }
 
 export async function getAssetVersions(

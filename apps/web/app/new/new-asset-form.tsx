@@ -23,7 +23,6 @@ const schema = z.object({
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Must be semver e.g. 1.0.0'),
   message: z.string().optional(),
   content: z.string().min(1, 'Required'),
-  is_public: z.boolean().optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -47,7 +46,6 @@ export function NewAssetForm({ username }: { username: string }) {
       version: '1.0.0',
       message: '',
       content: '',
-      is_public: false,
     },
   })
 
@@ -82,7 +80,7 @@ export function NewAssetForm({ username }: { username: string }) {
                   <Input {...field} placeholder="my-system-prompt" className="font-mono" />
                 </FormControl>
                 <p className="text-xs text-muted-foreground">
-                  Will be published as{' '}
+                  Will be saved as{' '}
                   <span className="font-mono text-foreground">
                     {username}/{previewSlug}
                   </span>
@@ -168,34 +166,6 @@ export function NewAssetForm({ username }: { username: string }) {
           />
         </div>
 
-        {/* Visibility toggle */}
-        <div className="border-b p-4">
-          <FormField
-            control={form.control}
-            name="is_public"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="is_public"
-                    checked={field.value ?? false}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                  <label htmlFor="is_public" className="text-sm cursor-pointer">
-                    Make this asset public
-                  </label>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Public assets are visible on the website. Others must use{' '}
-                  <span className="font-mono">--approve</span> to pull them.
-                </p>
-              </FormItem>
-            )}
-          />
-        </div>
-
         {/* Package note */}
         <div className="border-b bg-muted/30 px-4 py-3">
           <p className="text-xs text-muted-foreground">
@@ -208,7 +178,7 @@ export function NewAssetForm({ username }: { username: string }) {
         <div className="flex items-center justify-between gap-4 p-4">
           {serverError ? <p className="text-sm text-destructive">{serverError}</p> : <span />}
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Publishing…' : 'Publish asset'}
+            {isLoading ? 'Saving…' : 'Save asset'}
           </Button>
         </div>
       </form>

@@ -11,7 +11,6 @@ interface CreateAssetValues {
   version: string
   message?: string
   content: string
-  is_public?: boolean
 }
 
 export async function createAssetAction(values: CreateAssetValues): Promise<{ error: string }> {
@@ -26,15 +25,6 @@ export async function createAssetAction(values: CreateAssetValues): Promise<{ er
 
   const service = createServiceClient()
 
-  // Resolve username for redirect
-  const { data: userRecord } = await service
-    .from('users')
-    .select('username')
-    .eq('id', user.id)
-    .single()
-
-  const username = userRecord?.username ?? user.id
-
   const { data: asset, error: assetError } = await service
     .from('assets')
     .upsert(
@@ -45,7 +35,6 @@ export async function createAssetAction(values: CreateAssetValues): Promise<{ er
         description: values.description ?? null,
         asset_format: 'file',
         tags: [],
-        is_public: values.is_public === true,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -67,5 +56,5 @@ export async function createAssetAction(values: CreateAssetValues): Promise<{ er
     return { error: versionError.message }
   }
 
-  redirect(`/${username}/${values.slug}`)
+  redirect(`/dashboard/${values.slug}`)
 }

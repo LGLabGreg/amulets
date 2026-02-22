@@ -14,7 +14,7 @@ async function getUserAssets(userId: string) {
     .from('assets')
     .select('*, asset_versions(id, version, created_at)')
     .eq('owner_id', userId)
-    .order('created_at', { ascending: false })
+    .order('updated_at', { ascending: false })
   return data ?? []
 }
 
@@ -34,6 +34,10 @@ export default async function DashboardPage() {
     .single()
 
   const assets = await getUserAssets(user.id)
+
+  const totalFiles = assets.filter((a) => a.asset_format === 'file').length
+  const totalSkills = assets.filter((a) => a.asset_format === 'skill').length
+  const totalBundles = assets.filter((a) => a.asset_format === 'bundle').length
 
   return (
     <Container>
@@ -74,27 +78,21 @@ export default async function DashboardPage() {
         </div>
         <div className="px-4 py-3">
           <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
-            Public
-          </p>
-          <p className="font-mono text-2xl font-bold mt-1">
-            {assets.filter((a) => a.is_public).length}
-          </p>
-        </div>
-        <div className="px-4 py-3">
-          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
-            Directories
-          </p>
-          <p className="font-mono text-2xl font-bold mt-1">
-            {assets.filter((a) => a.asset_format !== 'file').length}
-          </p>
-        </div>
-        <div className="px-4 py-3">
-          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
             Files
           </p>
-          <p className="font-mono text-2xl font-bold mt-1">
-            {assets.filter((a) => a.asset_format === 'file').length}
+          <p className="font-mono text-2xl font-bold mt-1">{totalFiles}</p>
+        </div>
+        <div className="px-4 py-3">
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
+            Skills
           </p>
+          <p className="font-mono text-2xl font-bold mt-1">{totalSkills}</p>
+        </div>
+        <div className="px-4 py-3">
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
+            Bundles
+          </p>
+          <p className="font-mono text-2xl font-bold mt-1">{totalBundles}</p>
         </div>
       </div>
 
@@ -116,9 +114,8 @@ export default async function DashboardPage() {
       ) : (
         <div className="border">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_80px_80px_100px_100px] border-b bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <div className="grid grid-cols-[1fr_80px_100px_100px] border-b bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             <span>Name</span>
-            <span>Visibility</span>
             <span>Format</span>
             <span>Versions</span>
             <span>Updated</span>
@@ -136,11 +133,11 @@ export default async function DashboardPage() {
             return (
               <div
                 key={asset.id}
-                className={`grid grid-cols-[1fr_80px_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b' : ''}`}
+                className={`grid grid-cols-[1fr_80px_100px_100px] px-4 py-3 text-sm items-center hover:bg-muted/30 transition-colors ${!isLast ? 'border-b' : ''}`}
               >
                 <div className="min-w-0">
                   <Link
-                    href={`/${userRecord?.username}/${asset.slug}`}
+                    href={`/dashboard/${asset.slug}`}
                     className="font-mono font-semibold hover:underline truncate block"
                   >
                     {asset.slug}
@@ -152,15 +149,9 @@ export default async function DashboardPage() {
                   )}
                 </div>
                 <span>
-                  <Badge
-                    variant={asset.is_public ? 'default' : 'outline'}
-                    className="font-mono text-xs"
-                  >
-                    {asset.is_public ? 'public' : 'private'}
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {asset.asset_format}
                   </Badge>
-                </span>
-                <span className="text-xs text-muted-foreground font-mono">
-                  {asset.asset_format}
                 </span>
                 <span className="font-mono text-sm">
                   {versions.length}
@@ -169,7 +160,11 @@ export default async function DashboardPage() {
                   )}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {latest ? new Date(latest.created_at).toLocaleDateString() : '—'}
+                  {asset.updated_at
+                    ? new Date(asset.updated_at).toLocaleDateString()
+                    : latest
+                      ? new Date(latest.created_at).toLocaleDateString()
+                      : '—'}
                 </span>
               </div>
             )

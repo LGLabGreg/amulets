@@ -125,13 +125,23 @@ Tasks are worked through in order within each phase. Check off items as complete
 - [x] **B18** Dashboard — add public/private badge to each asset row
 - [x] **B19** Web-app CLI auth — replace direct Supabase PKCE flow with browser redirect to `amulets.dev/cli-auth`; add `/api/auth/me` and `/api/auth/refresh` routes; CLI needs no Supabase env vars
 
+### 7D — Private-Only Refactor
+
+See `docs/refactor-private-only.md` for full context and rationale.
+
+- [x] **P1** Migration: drop `asset_reports` table; drop `is_public` + `is_reported` from `assets`; drop `is_public` from `collections`; drop `fts` column + trigger from `assets`; add `updated_at timestamptz` to `assets`; replace all RLS policies with owner-only (`auth.uid() = owner_id`); regenerate `apps/web/lib/database.types.ts`
+- [x] **P2** API cleanup: delete `GET /api/assets/search` route; delete `POST /api/assets/:owner/:name/report` route; add auth + ownership check to `GET /api/assets/:owner/:name`, `GET .../versions`, `GET .../:version`; remove `is_public`, `is_reported`, `x-amulets-approve`, `review_url` logic from all routes
+- [x] **P3** CLI cleanup: remove `--public` flag from `push.ts`; remove `--approve` flag from `pull.ts`; remove `x-amulets-approve` header and `is_public` from `api.ts` push payloads; update program description in `index.ts` to `"Manage your private AI skills — push, pull, and sync"`
+- [x] **P4** Web overhaul: delete `app/explore/` directory; delete `app/[owner]/page.tsx` (public profile); delete `app/[owner]/[name]/[version]/page.tsx`; delete `components/explore-filters.tsx` + `components/report-button.tsx`; create `app/dashboard/[slug]/page.tsx` (auth-gated asset detail — metadata, version history, content render, delete); convert `app/[owner]/[name]/page.tsx` → redirect or fold into `/dashboard/:slug`; rebuild `app/page.tsx` as marketing/login page (no public listings); simplify `app/dashboard/page.tsx` (remove public badge, add updated_at + stats: Total/Skills/Files/Collections); remove `is_public` from `app/new/page.tsx` + `app/new/new-asset-form.tsx` + `app/new/actions.ts`; remove public badges from `components/asset-card.tsx`
+- [x] **P5** Docs: update `CLAUDE.md` (remove public/private arch section, update data model); update `README.md` (private-only framing, no `--public`/`--approve` examples); rewrite `docs/project-outline.md` (remove public registry scope)
+
 ---
 
 ## Phase 8 — Deploy & End-to-End Test
 
 - [ ] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
 - [ ] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
-- [ ] **C3** End-to-end smoke test: login → push private → pull → push public → pull without `--approve` (expect guidance) → pull with `--approve` → verify file structure
+- [ ] **C3** End-to-end smoke test: login → push file → push skill → pull → list → versions → view in dashboard → delete
 
 ---
 
@@ -145,22 +155,22 @@ Tasks are worked through in order within each phase. Check off items as complete
 ### 9B — Web UI
 
 - [ ] **D2** Add zip upload path to `/new` form for skill/bundle packages
-- [ ] **D4** Explore page: add cursor-based pagination (currently limited to 50)
+- ~~**D4** Explore page: add cursor-based pagination~~ — removed (explore page deleted in 7D)
 - [ ] **D5** Dashboard: render collections section (API exists, UI missing)
 
 ### 9C — API & Database
 
 - [ ] **D6** Version list: sort by parsed semver rather than `created_at`
-- [ ] **D7** Add `updated_at` column to `assets`, updated on each version push
+- ~~**D7** Add `updated_at` column to `assets`~~ — covered by P1 migration in 7D
 - [ ] **D9** Add rate limiting on push endpoint (Vercel rate limiting or per-user throttle)
 - [ ] **D10** Add user record existence check on `GET /api/me/assets` and `GET /api/me/collections`
 
 ### 9D — Docs & Config
 
 - [ ] **D8** Align CLI config path — verify actual path in `config.ts`, update CLAUDE.md and README
-- [ ] **E1** README — update examples to show `--public` on push, `--approve` on pull, private-first framing
-- [ ] **E2** CLAUDE.md — add public/private architecture section
-- [ ] **E3** `docs/project-outline.md` — update MVP scope to reflect private-by-default, `--approve` flow, report mechanism
+- ~~**E1** README — update examples to show `--public`/`--approve`~~ — superseded by P5 in 7D (private-only rewrite)
+- ~~**E2** CLAUDE.md — add public/private architecture section~~ — superseded by P5 in 7D
+- ~~**E3** `docs/project-outline.md` — update MVP scope to reflect `--approve` flow~~ — superseded by P5 in 7D
 
 ---
 
@@ -182,9 +192,9 @@ Tasks are worked through in order within each phase. Check off items as complete
 
 - [ ] **T54** CLI: `amulets inspect <owner/name>` — print file tree of a package without pulling
 - [ ] **T55** CLI: `amulets diff <owner/name> <v1> <v2>` — diff two versions
-- [ ] **T56** Web UI: `/:owner` user profile page (their public assets + collections)
+- ~~**T56** Web UI: `/:owner` user profile page~~ — removed (no public profiles in private-only model)
 - [ ] **T57** Web UI: version diff view (unified diff for text, file tree diff for packages)
-- [ ] **T58** Seed registry with high-quality skill packages (docx, pdf, pptx, xlsx)
+- ~~**T58** Seed registry with high-quality skill packages~~ — removed (no public registry)
 
 ---
 

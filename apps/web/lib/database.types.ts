@@ -6,72 +6,8 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: '14.1'
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      asset_reports: {
-        Row: {
-          asset_id: string
-          created_at: string
-          id: string
-          reason: string
-          reporter_id: string | null
-        }
-        Insert: {
-          asset_id: string
-          created_at?: string
-          id?: string
-          reason: string
-          reporter_id?: string | null
-        }
-        Update: {
-          asset_id?: string
-          created_at?: string
-          id?: string
-          reason?: string
-          reporter_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'asset_reports_asset_id_fkey'
-            columns: ['asset_id']
-            isOneToOne: false
-            referencedRelation: 'assets'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'asset_reports_reporter_id_fkey'
-            columns: ['reporter_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
-      }
       asset_versions: {
         Row: {
           asset_id: string
@@ -118,40 +54,34 @@ export type Database = {
           asset_format: string
           created_at: string
           description: string | null
-          fts: unknown
           id: string
-          is_public: boolean
-          is_reported: boolean
           name: string
           owner_id: string
           slug: string
           tags: string[]
+          updated_at: string
         }
         Insert: {
           asset_format: string
           created_at?: string
           description?: string | null
-          fts?: unknown
           id?: string
-          is_public?: boolean
-          is_reported?: boolean
           name: string
           owner_id: string
           slug: string
           tags?: string[]
+          updated_at?: string
         }
         Update: {
           asset_format?: string
           created_at?: string
           description?: string | null
-          fts?: unknown
           id?: string
-          is_public?: boolean
-          is_reported?: boolean
           name?: string
           owner_id?: string
           slug?: string
           tags?: string[]
+          updated_at?: string
         }
         Relationships: [
           {
@@ -214,7 +144,6 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          is_public: boolean
           name: string
           owner_id: string
           slug: string
@@ -223,7 +152,6 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          is_public?: boolean
           name: string
           owner_id: string
           slug: string
@@ -232,7 +160,6 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          is_public?: boolean
           name?: string
           owner_id?: string
           slug?: string
@@ -403,9 +330,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
