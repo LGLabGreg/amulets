@@ -27,6 +27,7 @@ const COMMANDS = [
   { cmd: 'pull <name>', desc: 'Pull your asset by name' },
   { cmd: 'list', desc: 'List your assets' },
   { cmd: 'versions <name>', desc: 'List all versions' },
+  { cmd: 'delete <slug>', desc: 'Delete an asset and all its versions' },
 ] as const
 
 export default function Home() {
@@ -45,7 +46,7 @@ export default function Home() {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/dashboard">
-              <Button size="sm">Go to dashboard</Button>
+              <Button>Go to dashboard</Button>
             </Link>
             <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
           </div>
@@ -111,7 +112,7 @@ export default function Home() {
       {/* CLI Reference */}
       <section className="border-t">
         <Container className="p-0 border-x">
-          <div className="grid grid-cols-2 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x">
+          <div className="grid grid-cols-2 sm:grid-cols-6 divide-y sm:divide-y-0 sm:divide-x">
             {COMMANDS.map(({ cmd, desc }) => (
               <div key={cmd} className="px-4 py-3 space-y-1">
                 <p className="font-mono text-xs font-semibold">{cmd}</p>
