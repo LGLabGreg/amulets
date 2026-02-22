@@ -24,3 +24,6 @@ jobs:
 
       - name: Build CLI
         run: pnpm --filter amulets-cli build
+
+      - name: Type check web
+        run: pnpm --filter web exec tsc --noEmit

@@ -1,6 +1,6 @@
 import type { Command } from 'commander'
 import ora from 'ora'
-import { ApiError, getAssetVersions, getMe } from '../lib/api.js'
+import { friendlyApiError, getAssetVersions, getMe } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 export function registerVersions(program: Command): void {
@@ -53,8 +53,7 @@ export function registerVersions(program: Command): void {
           console.log(`${v.version.padEnd(versionWidth)}  ${date.padEnd(20)}  ${msg}`)
         }
       } catch (err) {
-        const message = err instanceof ApiError ? err.message : String(err)
-        spinner.fail(`Failed to list versions: ${message}`)
+        spinner.fail(`Failed to list versions: ${friendlyApiError(err)}`)
         process.exit(1)
       }
     })

@@ -18,7 +18,7 @@ const program = new Command()
 program
   .name('amulets')
   .description('Manage your private AI skills — push, pull, and sync')
-  .version(version, '-v, --version', 'output the version number')
+  .version(version, '-V, --version', 'output the version number')
 
 registerLogin(program)
 registerLogout(program)

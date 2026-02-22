@@ -4,7 +4,7 @@ import { Readable } from 'node:stream'
 import type { Command } from 'commander'
 import ora from 'ora'
 import unzipper from 'unzipper'
-import { ApiError, getAssetVersion, getMe } from '../lib/api.js'
+import { friendlyApiError, getAssetVersion, getMe } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 async function downloadToBuffer(url: string): Promise<Buffer> {
@@ -59,14 +59,14 @@ export function registerPull(program: Command): void {
 
         if (data.content !== undefined) {
           // Simple asset
-          const outputPath = options.output ?? `${name}.md`
+          const outputPath = options.output ?? (data.filename || `${name}.md`)
           const resolvedOutput = path.resolve(outputPath)
           fs.mkdirSync(path.dirname(resolvedOutput), { recursive: true })
           fs.writeFileSync(resolvedOutput, data.content, 'utf-8')
           spinner.succeed(`Pulled ${ownerName}@${data.version} → ${outputPath}`)
         } else if (data.download_url) {
           // Skill/bundle package
-          const outputDir = options.output ?? name
+          const outputDir = options.output ?? (data.filename || name)
           const resolvedDir = path.resolve(outputDir)
           spinner.text = 'Downloading package...'
           const buffer = await downloadToBuffer(data.download_url)
@@ -79,8 +79,7 @@ export function registerPull(program: Command): void {
           process.exit(1)
         }
       } catch (err) {
-        const message = err instanceof ApiError ? err.message : String(err)
-        spinner.fail(`Pull failed: ${message}`)
+        spinner.fail(`Pull failed: ${friendlyApiError(err)}`)
         process.exit(1)
       }
     })
