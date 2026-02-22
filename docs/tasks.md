@@ -154,7 +154,22 @@ See `docs/refactor-private-only.md` for full context and rationale.
 
 ---
 
-## Phase 9 — Post-Deploy Improvements
+## Phase 8B — Launch Hardening (Pre-MVP Blockers)
+
+All 8 items were unaddressed as of the post-deploy review. Fix in order before calling the MVP done.
+
+- [x] **L1** Delete `components/asset-card.tsx` and `components/asset-grid.tsx` — both are dead code (not imported anywhere in `app/`); `AssetCard` still links to the deleted `/:owner/:name` route
+- [x] **L2** `POST /api/assets` — add regex validation for `slug` (`/^[a-z0-9][a-z0-9-]*[a-z0-9]$/`, min 2 chars, or single char) and `name` fields in both `handleSimplePush` and `handlePackagePush`; return 400 on invalid input
+- [x] **L3** `handlePackagePush` — wrap `JSON.parse(metadataStr)` and `JSON.parse(fileManifestStr)` in try/catch; return 400 with `{ error: 'Invalid metadata JSON' }` on parse failure
+- [x] **L4** `POST /api/assets` — add semver regex check (`/^\d+\.\d+\.\d+$/`) in both push handlers immediately after the `"latest"` reserved-string check; return 400 with a clear message if invalid
+- [x] **L5** Add `DELETE` handler to `app/api/assets/[owner]/[name]/route.ts` — requires auth + ownership; deletes all `asset_versions` rows, removes the zip from the `packages` Storage bucket, deletes the asset record; returns 204. Add a delete button/action to `app/dashboard/[slug]/page.tsx` wired to this endpoint
+- [x] **L6** `handlePackagePush` — after the semver check (L4), also reject versions containing `/`, `\`, or `..` to prevent storage path traversal; return 400 with a clear message
+- [x] **L7** `POST /api/assets` — add per-user rate limiting: count `asset_versions` rows created by this user in the last 60 seconds; reject with 429 if > 10
+- [x] **L8** Replace `apps/web/README.md` boilerplate (create-next-app template) with a project-specific README: what the app is, how to run locally (`pnpm install`, env vars, `pnpm --filter web dev`), link to `CLAUDE.md`
+
+---
+
+## Phase 9 — Post-MVP Improvements
 
 ### 9A — CLI
 
@@ -169,10 +184,10 @@ See `docs/refactor-private-only.md` for full context and rationale.
 ### 9C — API & Database
 
 - [ ] **D6** Version list: sort by parsed semver rather than `created_at`
-- [ ] **D11** Verify that deleting an asset cascades correctly — DB record, asset versions, and storage zip all removed
+- [ ] **D11** Verify delete cascade end-to-end after L5 — confirm DB record, all `asset_versions`, and storage zip are all removed cleanly
 - [ ] **D12** Store the original relative path on push (e.g. `.agents/skills/dir`) so `amulets pull` restores to the same path by default
 - ~~**D7** Add `updated_at` column to `assets`~~ — covered by P1 migration in 7D
-- [ ] **D9** Add rate limiting on push endpoint (Vercel rate limiting or per-user throttle)
+- [ ] **D9** Production-grade rate limiting on push endpoint — Vercel edge rate limiting or a proper middleware layer (L7 covers the basic per-user throttle; this is the production hardening step)
 - [ ] **D10** Add user record existence check on `GET /api/me/assets` and `GET /api/me/collections`
 
 ### 9D — Docs & Config

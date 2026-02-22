@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
+import { DeleteAssetButton } from '@/components/delete-asset-button'
 import { MarkdownContent } from '@/components/markdown-content'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/utils/supabase/server'
@@ -105,7 +106,7 @@ export default async function DashboardAssetPage({ params }: { params: Promise<P
           </div>
 
           {/* Actions */}
-          <div className="mb-8 flex gap-2">
+          <div className="mb-8 flex flex-wrap items-center gap-2">
             <CopyButton
               text={`amulets pull ${username}/${slug}`}
               label={`amulets pull ${username}/${slug}`}
@@ -113,6 +114,7 @@ export default async function DashboardAssetPage({ params }: { params: Promise<P
             {asset.asset_format === 'file' && latest?.content && (
               <CopyButton text={latest.content} label="Copy file" />
             )}
+            <DeleteAssetButton username={username} slug={slug} />
           </div>
 
           {/* Content */}
