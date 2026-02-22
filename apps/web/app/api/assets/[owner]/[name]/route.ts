@@ -26,7 +26,7 @@ export async function DELETE(
 
   const { data: asset } = await service
     .from('assets')
-    .select('id, asset_format')
+    .select('id')
     .eq('owner_id', user.id)
     .eq('slug', name)
     .single()
@@ -35,24 +35,8 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Remove zips from storage for skill/bundle assets
-  if (asset.asset_format === 'skill' || asset.asset_format === 'bundle') {
-    const { data: versions } = await service
-      .from('asset_versions')
-      .select('storage_path')
-      .eq('asset_id', asset.id)
-      .not('storage_path', 'is', null)
-
-    const paths = (versions ?? []).map((v) => v.storage_path).filter((p): p is string => p !== null)
-
-    if (paths.length > 0) {
-      await service.storage.from('packages').remove(paths)
-    }
-  }
-
-  // Delete asset_versions (cascade would handle this, but be explicit)
-  await service.from('asset_versions').delete().eq('asset_id', asset.id)
-
+  // Deleting the asset cascades to asset_versions; the on_asset_version_delete
+  // trigger then removes associated storage objects automatically.
   const { error: deleteError } = await service
     .from('assets')
     .delete()
