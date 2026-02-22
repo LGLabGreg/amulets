@@ -1,7 +1,7 @@
 {
   "name": "amulets-cli",
   "version": "0.1.0",
-  "description": "CLI for the Amulets registry — push and pull AI workflow assets",
+  "description": "Your private AI skills, everywhere.",
   "keywords": [
     "ai",
     "cli",
@@ -18,7 +18,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "dev": "tsc --watch",
     "prepublishOnly": "pnpm build"
   },

@@ -139,7 +139,7 @@ See `docs/refactor-private-only.md` for full context and rationale.
 
 ## Phase 8 — Deploy & End-to-End Test
 
-- [ ] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
+- [x] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
 - [ ] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
 - [ ] **C3** End-to-end smoke test: login → push file → push skill → pull → list → versions → view in dashboard → delete
 
