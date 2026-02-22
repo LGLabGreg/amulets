@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Container } from '@/components/container'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/utils/supabase/server'
 
 const HOW_IT_WORKS = [
   {
@@ -32,7 +33,12 @@ const COMMANDS = [
   { cmd: 'logout', desc: 'Remove stored credentials' },
 ] as const
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <div>
       {/* Hero */}
@@ -46,11 +52,16 @@ export default function Home() {
             stays private — only you can access your library.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/dashboard">
-              <Button>Go to dashboard</Button>
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center gap-2">
+            {user && (
+              <Link href="/dashboard">
+                <Button>Go to dashboard</Button>
+              </Link>
+            )}
             <CopyButton text="npm install -g amulets-cli" label="npm install -g amulets-cli" />
+            <Button variant="outline" className="font-mono">
+              amulets --help
+            </Button>
           </div>
         </Container>
       </section>
