@@ -140,8 +140,17 @@ See `docs/refactor-private-only.md` for full context and rationale.
 ## Phase 8 — Deploy & End-to-End Test
 
 - [x] **C1** Deploy `apps/web` to Vercel — connect repo, set all env vars
-- [ ] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
-- [ ] **C3** End-to-end smoke test: login → push file → push skill → pull → list → versions → view in dashboard → delete
+- [x] **C2** Publish `amulets-cli` to npm — verify package name, run `npm publish`
+- [ ] **C3** End-to-end smoke test (manual, against prod):
+  1. `amulets login` → browser opens, GitHub OAuth completes, token saved
+  2. `amulets push AGENTS.md -n test-agents -v 1.0.0` → succeeds with slug + version
+  3. Create a folder with `SKILL.md` inside; `amulets push ./my-skill -n test-skill -v 1.0.0` → zip uploaded
+  4. `amulets pull test-agents` → `.md` file written locally
+  5. `amulets pull test-skill` → folder extracted locally
+  6. `amulets list` → both assets appear
+  7. `amulets versions test-agents` → shows `1.0.0`
+  8. Open `amulets.dev/dashboard` → both assets visible; click into one, metadata + content renders
+  9. Delete both test assets from the dashboard
 
 ---
 
