@@ -5,6 +5,7 @@ export interface Asset {
   name: string
   slug: string
   description: string | null
+  filename: string
   asset_format: 'file' | 'skill' | 'bundle'
   tags: string[]
   created_at: string
@@ -65,6 +66,7 @@ export async function pushSimpleAsset(
     version: string
     message?: string
     content: string
+    filename: string
   },
 ): Promise<{ asset: Asset; version: AssetVersion }> {
   return request('/api/assets', {
@@ -93,6 +95,7 @@ export async function getAssetVersion(
   token: string,
 ): Promise<{
   version: string
+  filename?: string
   content?: string
   download_url?: string
   file_manifest?: unknown
@@ -120,4 +123,16 @@ export async function listMyAssets(token: string): Promise<{
   >
 }> {
   return request('/api/me/assets', { token })
+}
+
+export function friendlyApiError(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 401) return 'Not authenticated. Run `amulets login` first.'
+    return err.message
+  }
+  const msg = String(err)
+  if (msg.includes('fetch failed') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')) {
+    return 'Could not reach the server. Check your internet connection.'
+  }
+  return msg
 }

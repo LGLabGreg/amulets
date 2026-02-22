@@ -5,7 +5,7 @@ import { PassThrough } from 'node:stream'
 import archiver from 'archiver'
 import type { Command } from 'commander'
 import ora from 'ora'
-import { ApiError, pushPackageAsset, pushSimpleAsset } from '../lib/api.js'
+import { ApiError, friendlyApiError, pushPackageAsset, pushSimpleAsset } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 interface FileEntry {
@@ -77,17 +77,11 @@ async function zipFolder(folderPath: string): Promise<Buffer> {
 }
 
 function friendlyPushError(err: unknown, version: string, slug: string): string {
-  if (!(err instanceof ApiError)) {
-    const msg = String(err)
-    if (msg.includes('fetch failed') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')) {
-      return 'Could not reach the server. Check your internet connection.'
-    }
-    return msg
-  }
+  if (!(err instanceof ApiError)) return friendlyApiError(err)
 
   const { status, message } = err
 
-  if (status === 401) return 'Not authenticated. Run `amulets login` first.'
+  if (status === 401) return friendlyApiError(err)
   if (status === 413) return 'Package exceeds the 4 MB size limit.'
   if (
     status === 409 ||
@@ -176,6 +170,7 @@ export function registerPush(program: Command): void {
                 tags,
                 version: options.version,
                 message: options.message,
+                filename: path.basename(resolvedPath),
               }),
             )
             formData.append('file_manifest', JSON.stringify(fileManifest))
@@ -205,6 +200,7 @@ export function registerPush(program: Command): void {
               version: options.version,
               message: options.message,
               content,
+              filename: path.basename(resolvedPath),
             })
             spinner.succeed(`Pushed file: ${result.asset.slug} @ ${result.version.version}`)
           }

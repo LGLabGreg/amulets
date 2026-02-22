@@ -1,6 +1,6 @@
 import type { Command } from 'commander'
 import ora from 'ora'
-import { ApiError, listMyAssets } from '../lib/api.js'
+import { friendlyApiError, listMyAssets } from '../lib/api.js'
 import { requireToken } from '../lib/config.js'
 
 export function registerList(program: Command): void {
@@ -40,8 +40,7 @@ export function registerList(program: Command): void {
           )
         }
       } catch (err) {
-        const message = err instanceof ApiError ? err.message : String(err)
-        spinner.fail(`Failed to list assets: ${message}`)
+        spinner.fail(`Failed to list assets: ${friendlyApiError(err)}`)
         process.exit(1)
       }
     })

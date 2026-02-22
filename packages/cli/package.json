@@ -18,8 +18,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist && tsc && chmod +x dist/index.js",
     "dev": "tsc --watch",
+    "link:global": "pnpm build && npm link",
+    "unlink:global": "npm unlink -g amulets-cli",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {

@@ -33,11 +33,11 @@ export async function POST(request: Request) {
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
-  const { name, slug, description, tags, version, message, content } = body
+  const { name, slug, description, tags, version, message, content, filename } = body
 
-  if (!name || !slug || !version || !content) {
+  if (!name || !slug || !version || !content || !filename) {
     return NextResponse.json(
-      { error: 'name, slug, version, and content are required' },
+      { error: 'name, slug, version, content, and filename are required' },
       { status: 400 },
     )
   }
@@ -59,6 +59,7 @@ async function handleSimplePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format: 'file',
         tags: tags ?? [],
+        filename,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -100,12 +101,13 @@ async function handlePackagePush(request: Request, ownerId: string) {
     )
   }
 
-  const { name, slug, description, asset_format, tags, version, message } = JSON.parse(metadataStr)
+  const { name, slug, description, asset_format, tags, version, message, filename } =
+    JSON.parse(metadataStr)
   const file_manifest = JSON.parse(fileManifestStr)
 
-  if (!name || !slug || !version) {
+  if (!name || !slug || !version || !filename) {
     return NextResponse.json(
-      { error: 'name, slug, and version are required in metadata' },
+      { error: 'name, slug, version, and filename are required in metadata' },
       { status: 400 },
     )
   }
@@ -134,6 +136,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format,
         tags: tags ?? [],
+        filename,
       },
       { onConflict: 'owner_id,slug' },
     )
