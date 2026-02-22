@@ -12,7 +12,7 @@ export default function Footer() {
             Dashboard
           </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/LGLabGreg/amulets"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-foreground"
