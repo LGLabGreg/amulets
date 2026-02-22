@@ -2,6 +2,14 @@
 
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 const COMMANDS = [
   {
@@ -61,7 +69,7 @@ export function CLIHelpSheet() {
       <SheetTrigger render={<Button variant="outline" className="font-mono" />}>
         amulets --help
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+      <SheetContent side="right" className="w-full! sm:max-w-md! overflow-y-auto">
         <SheetHeader className="border-b pb-4">
           <SheetTitle className="font-mono text-sm">amulets --help</SheetTitle>
         </SheetHeader>
@@ -70,20 +78,28 @@ export function CLIHelpSheet() {
           {COMMANDS.map(({ syntax, desc, flags }) => (
             <div key={syntax} className="px-4 py-4 space-y-2">
               <div>
-                <p className="font-mono text-xs font-semibold">amulets {syntax}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
+                <p className="font-mono font-semibold">amulets {syntax}</p>
+                <p className="mt-0.5 text-muted-foreground">{desc}</p>
               </div>
               {flags.length > 0 && (
-                <div className="space-y-1 pt-1">
-                  {flags.map(({ flag, desc: flagDesc }) => (
-                    <div key={flag} className="grid grid-cols-[auto_1fr] gap-x-3 text-xs">
-                      <span className="font-mono text-muted-foreground/70 whitespace-nowrap">
-                        {flag}
-                      </span>
-                      <span className="text-muted-foreground">{flagDesc}</span>
-                    </div>
-                  ))}
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Flag</TableHead>
+                      <TableHead className="text-xs">Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {flags.map(({ flag, desc: flagDesc }) => (
+                      <TableRow key={flag}>
+                        <TableCell className="font-mono text-muted-foreground whitespace-nowrap">
+                          {flag}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{flagDesc}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </div>
           ))}
