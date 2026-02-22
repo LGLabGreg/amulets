@@ -10,6 +10,10 @@
     "cursorrules"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LGLabGreg/amulets"
+  },
   "main": "dist/index.js",
   "bin": {
     "amulets": "dist/index.js"
