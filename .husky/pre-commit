@@ -1,7 +1,4 @@
 pnpm exec lint-staged
 
-# Regenerate Supabase types if any migration files are staged
-if git diff --cached --name-only | grep -q "apps/web/supabase/migrations/"; then
-  pnpm --filter web gen-types
-  git add apps/web/lib/database.types.ts
-fi
+pnpm --filter web gen-types
+git add apps/web/lib/database.types.ts
