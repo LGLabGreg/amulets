@@ -7,6 +7,8 @@ export interface Config {
   refresh_token?: string
   expires_at?: number
   apiUrl?: string
+  lastUpdateCheck?: number
+  latestVersion?: string
 }
 
 export function getConfigPath(): string {
