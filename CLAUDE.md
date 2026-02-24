@@ -1,37 +1,17 @@
 # Amulets — Claude Code Instructions
 
+## Maintenance
+
+This file is maintained by Claude. When a conversation reveals a non-obvious pattern, architectural decision, or gotcha that would affect future work, propose adding it here: _"This pattern would be useful in CLAUDE.md — should I add it?"_ Equally, flag anything that has become stale or obvious and suggest removing it. Only update the file when the user confirms.
+
 ## Project Overview
 
 A CLI-first **private** skill management platform for AI workflow assets (prompts, skills, `.cursorrules`, `AGENTS.md`).
-"Your private AI skills library." Domain: `amulets.dev`
-
-**Positioning:** "npx skills is how you discover public skills. Amulet is how you manage your private ones."
-All assets are private by default — only the owner can access them. No public registry, no public browsing.
-
-## Monorepo Structure
-
-```
-apps/
-  web/          # Next.js 16 App Router — web UI + API routes
-packages/
-  cli/          # TypeScript CLI, published to npm as amulets-cli
-docs/
-  project-outline.md   # Full spec, data model, roadmap
-  tasks.md             # Master task list
-```
+All assets are private — only the owner can access them. No public registry, no public browsing.
 
 ## Package Manager
 
 **Always use `pnpm`.** Never use npm or yarn.
-
-```bash
-pnpm install              # install all workspaces
-pnpm --filter web dev     # run web dev server
-pnpm --filter cli build   # build CLI
-pnpm test                 # run all tests (Vitest)
-pnpm lint                 # Biome lint
-pnpm format               # Biome format
-```
 
 **Always install packages with `@latest`** — never hardcode a version number from memory. Training data versions are stale.
 
@@ -43,45 +23,13 @@ pnpm --filter amulets-cli add some-package@latest
 ## Code Style
 
 - **Biome** for linting and formatting (not ESLint/Prettier)
-- **TypeScript strict mode** everywhere
 - No `any` unless absolutely unavoidable
-- Prefer `const` over `let`
-- Named exports over default exports (except Next.js page components which require default)
 
-## Tech Stack
+## Database
 
-### Web (`apps/web`)
-
-- Next.js 16 App Router (server components by default)
-- Supabase JS client (`@supabase/ssr` for server/client split)
-- Tailwind CSS + Shadcn/ui
-- Shiki for code highlighting
-
-### CLI (`packages/cli`)
-
-- Commander.js for argument parsing
-- `archiver` for zipping skill packages, `unzipper` for unpacking
-- `ora` for spinners
-- Credentials stored in `~/.config/amulets/config.json`
-
-### Database
-
-- Supabase Postgres with Row Level Security
 - Migrations in `apps/web/supabase/migrations/`
 - **Use the Supabase MCP server** to apply migrations and query the database directly — it is configured in `~/.claude.json` and available in Claude Code sessions
 - **Never manually edit `apps/web/lib/database.types.ts`** — it is auto-generated from the live schema. If types and code conflict, the code is wrong; fix the code or write a migration
-
-## Environment Variables
-
-See `apps/web/.env.example`. Required:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
-
-CLI reads from `~/.config/amulets/config.json` (written by `amulets login`).
 
 ## Key Architectural Decisions
 
@@ -107,28 +55,6 @@ Auto-detection on `amulets push`:
 All directory formats (skill + bundle) are stored as zipped archives in Supabase Storage.
 The `type` column has been removed. Use `tags` for categorisation instead.
 
-## Data Model (key tables)
-
-```
-User:           id, github_id, username, avatar_url, created_at
-Asset:          id, owner_id, name, slug, description, asset_format (file|skill|bundle), tags[], created_at, updated_at
-AssetVersion:   id, asset_id, version (semver), message, content (nullable), storage_path (nullable), file_manifest (jsonb), created_at
-Collection:     id, owner_id, name, slug, description, created_at
-CollectionItem: id, collection_id, asset_id, pinned_version_id, order
-```
-
-RLS is owner-only on all tables (`auth.uid() = owner_id`).
-
-## Web App Routes
-
-```
-/                     Landing/marketing page (unauthenticated)
-/dashboard            Your skills library (authenticated)
-/dashboard/:slug      Asset detail view (authenticated, owner-only)
-/new                  Push asset via web form (authenticated)
-/cli-auth             CLI authentication callback
-```
-
 ## Static Pages with Auth-Dependent UI
 
 Pages that are mostly static (e.g. `/`) must **not** call `supabase.auth.getUser()` at the page level — that opts the entire route out of static rendering and blocks the initial HTML.
@@ -139,9 +65,15 @@ Pages that are mostly static (e.g. `/`) must **not** call `supabase.auth.getUser
 // ✅ Correct — page is static, button streams in
 async function DashboardButton() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) return null
-  return <Link href="/dashboard"><Button>Go to dashboard</Button></Link>
+  return (
+    <Link href='/dashboard'>
+      <Button>Go to dashboard</Button>
+    </Link>
+  )
 }
 
 export default function Page() {
@@ -157,16 +89,14 @@ export default function Page() {
 
 // ❌ Wrong — makes the entire page dynamic
 export default async function Page() {
-  const { data: { user } } = await supabase.auth.getUser()
-  return <>{user && <Link href="/dashboard">...</Link>}</>
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return <>{user && <Link href='/dashboard'>...</Link>}</>
 }
 ```
 
 The same rule applies to any component rendered in the root layout (e.g. `Header`) — auth-dependent parts are isolated in `HeaderAuth` wrapped in `<Suspense>`.
-
-## API Route Pattern
-
-All API routes live in `apps/web/app/api/`. Every route uses the service role client and requires authentication via `getAuthUser(request)`. There is no anonymous/public read access.
 
 ## Shadcn/UI Rules
 
@@ -181,9 +111,3 @@ All API routes live in `apps/web/app/api/`. Every route uses the service role cl
 ## Task Plan
 
 See `docs/tasks.md` for the full task list. Work through tasks in order.
-
-## Testing
-
-- Unit tests: `packages/cli/src/__tests__/`
-- Integration tests (API): `apps/web/__tests__/`
-- Run with: `pnpm test`
