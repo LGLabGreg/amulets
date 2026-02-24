@@ -85,7 +85,7 @@ export type Database = {
           asset_format: string
           created_at: string
           description: string | null
-          filename: string
+          filepath: string | null
           id: string
           name: string
           owner_id: string
@@ -97,7 +97,7 @@ export type Database = {
           asset_format: string
           created_at?: string
           description?: string | null
-          filename?: string
+          filepath?: string | null
           id?: string
           name: string
           owner_id: string
@@ -109,7 +109,7 @@ export type Database = {
           asset_format?: string
           created_at?: string
           description?: string | null
-          filename?: string
+          filepath?: string | null
           id?: string
           name?: string
           owner_id?: string

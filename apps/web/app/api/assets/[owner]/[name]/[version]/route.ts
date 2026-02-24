@@ -26,7 +26,7 @@ export async function GET(
 
   const { data: asset } = await service
     .from('assets')
-    .select('id, asset_format, filename')
+    .select('id, asset_format, filepath')
     .eq('owner_id', user.id)
     .eq('slug', name)
     .single()
@@ -51,7 +51,7 @@ export async function GET(
   }
 
   if (asset.asset_format === 'file') {
-    return NextResponse.json({ version: av.version, content: av.content, filename: asset.filename })
+    return NextResponse.json({ version: av.version, content: av.content, filepath: asset.filepath })
   }
 
   // Skill/bundle: return a signed download URL
@@ -65,7 +65,7 @@ export async function GET(
 
   return NextResponse.json({
     version: av.version,
-    filename: asset.filename,
+    filepath: asset.filepath,
     download_url: signedUrl.signedUrl,
     file_manifest: av.file_manifest,
   })

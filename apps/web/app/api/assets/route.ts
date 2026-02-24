@@ -82,11 +82,11 @@ async function checkRateLimit(ownerId: string): Promise<boolean> {
 async function handleSimplePush(request: Request, ownerId: string) {
   const service = createServiceClient()
   const body = await request.json()
-  const { name, slug, description, tags, version, message, content, filename } = body
+  const { name, slug, description, tags, version, message, content, filepath } = body
 
-  if (!name || !slug || !version || !content || !filename) {
+  if (!name || !slug || !version || !content || !filepath) {
     return NextResponse.json(
-      { error: 'name, slug, version, content, and filename are required' },
+      { error: 'name, slug, version, content, and filepath are required' },
       { status: 400 },
     )
   }
@@ -118,7 +118,7 @@ async function handleSimplePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format: 'file',
         tags: tags ?? [],
-        filename,
+        filepath,
       },
       { onConflict: 'owner_id,slug' },
     )
@@ -173,7 +173,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
     return NextResponse.json({ error: 'Invalid file_manifest JSON' }, { status: 400 })
   }
 
-  const { name, slug, description, asset_format, tags, version, message, filename } = metadata as {
+  const { name, slug, description, asset_format, tags, version, message, filepath } = metadata as {
     name?: string
     slug?: string
     description?: string
@@ -181,12 +181,12 @@ async function handlePackagePush(request: Request, ownerId: string) {
     tags?: string[]
     version?: string
     message?: string
-    filename?: string
+    filepath?: string
   }
 
-  if (!name || !slug || !version || !filename) {
+  if (!name || !slug || !version || !filepath) {
     return NextResponse.json(
-      { error: 'name, slug, version, and filename are required in metadata' },
+      { error: 'name, slug, version, and filepath are required in metadata' },
       { status: 400 },
     )
   }
@@ -225,7 +225,7 @@ async function handlePackagePush(request: Request, ownerId: string) {
         description: description ?? null,
         asset_format,
         tags: tags ?? [],
-        filename,
+        filepath,
       },
       { onConflict: 'owner_id,slug' },
     )

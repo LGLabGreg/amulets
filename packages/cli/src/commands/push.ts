@@ -33,6 +33,19 @@ function toSlug(name: string): string {
     .replace(/^-|-$/g, '')
 }
 
+function computeFilepath(inputPath: string): string {
+  if (path.isAbsolute(inputPath)) {
+    throw new Error(
+      'Absolute paths are not supported. Use a relative path instead (e.g. .cursor/rules/code.mdc).',
+    )
+  }
+  const normalized = inputPath.replace(/^\.\//, '').replace(/\\/g, '/')
+  if (normalized.split('/').some((part) => part === '..')) {
+    throw new Error('Path must not contain ".." components.')
+  }
+  return normalized
+}
+
 function detectFormat(resolvedPath: string, isDirectory: boolean): 'file' | 'skill' | 'bundle' {
   if (!isDirectory) return 'file'
   if (fs.existsSync(path.join(resolvedPath, 'SKILL.md'))) return 'skill'
@@ -118,6 +131,15 @@ export function registerPush(program: Command): void {
         },
       ) => {
         const token = await requireToken()
+
+        let filepath: string
+        try {
+          filepath = computeFilepath(assetPath)
+        } catch (err) {
+          console.error(`Error: ${(err as Error).message}`)
+          process.exit(1)
+        }
+
         const resolvedPath = path.resolve(assetPath)
 
         if (!fs.existsSync(resolvedPath)) {
@@ -170,7 +192,7 @@ export function registerPush(program: Command): void {
                 tags,
                 version: options.version,
                 message: options.message,
-                filename: path.basename(resolvedPath),
+                filepath,
               }),
             )
             formData.append('file_manifest', JSON.stringify(fileManifest))
@@ -200,7 +222,7 @@ export function registerPush(program: Command): void {
               version: options.version,
               message: options.message,
               content,
-              filename: path.basename(resolvedPath),
+              filepath,
             })
             spinner.succeed(`Pushed file: ${result.asset.slug} @ ${result.version.version}`)
           }

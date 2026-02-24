@@ -173,6 +173,16 @@ export default async function DashboardAssetPage({ params }: { params: Promise<P
             </div>
           )}
 
+          {/* Path */}
+          {asset.filepath && (
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Path
+              </p>
+              <p className="font-mono text-xs text-muted-foreground break-all">{asset.filepath}</p>
+            </div>
+          )}
+
           {/* Published */}
           <div>
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
