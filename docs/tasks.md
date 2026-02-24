@@ -174,6 +174,7 @@ All 8 items were unaddressed as of the post-deploy review. Fix in order before c
 ### 9A — CLI
 
 - [ ] **D3** Auto-extract description from YAML frontmatter or first paragraph of markdown on push
+- [ ] Auto-complete/suggest amulets name when typing `amulets pull ...`
 
 ### 9B — Web UI
 
