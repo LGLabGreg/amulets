@@ -35,8 +35,19 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Deleting the asset cascades to asset_versions; the on_asset_version_delete
-  // trigger then removes associated storage objects automatically.
+  // Delete storage objects before removing DB rows (trigger approach is blocked by Supabase)
+  // Collect storage paths from all versions before deleting
+  const { data: versions } = await service
+    .from('asset_versions')
+    .select('storage_path')
+    .eq('asset_id', asset.id)
+    .not('storage_path', 'is', null)
+
+  if (versions && versions.length > 0) {
+    const paths = versions.map((v) => v.storage_path as string)
+    await service.storage.from('packages').remove(paths)
+  }
+
   const { error: deleteError } = await service
     .from('assets')
     .delete()
