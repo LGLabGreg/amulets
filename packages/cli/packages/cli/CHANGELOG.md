@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.4.0...amulets-cli-v0.5.0) (2026-02-24)
+
+
+### Features
+
+* store and restore original push path (filepath) ([ff00856](https://github.com/LGLabGreg/amulets/commit/ff00856cc7f0abf5acf7249b2d92cb0a397e7e4c))
+* store and restore original push path (filepath) ([c4e4798](https://github.com/LGLabGreg/amulets/commit/c4e4798efaa2e14ba95bcfbb436c482096c61592))
+
 ## [0.4.0](https://github.com/LGLabGreg/amulets/compare/amulets-cli-v0.3.1...amulets-cli-v0.4.0) (2026-02-22)
 
 
