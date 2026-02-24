@@ -5,7 +5,7 @@ export interface Asset {
   name: string
   slug: string
   description: string | null
-  filename: string
+  filepath: string | null
   asset_format: 'file' | 'skill' | 'bundle'
   tags: string[]
   created_at: string
@@ -66,7 +66,7 @@ export async function pushSimpleAsset(
     version: string
     message?: string
     content: string
-    filename: string
+    filepath: string
   },
 ): Promise<{ asset: Asset; version: AssetVersion }> {
   return request('/api/assets', {
@@ -95,7 +95,7 @@ export async function getAssetVersion(
   token: string,
 ): Promise<{
   version: string
-  filename?: string
+  filepath?: string | null
   content?: string
   download_url?: string
   file_manifest?: unknown

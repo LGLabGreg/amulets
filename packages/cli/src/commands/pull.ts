@@ -59,14 +59,14 @@ export function registerPull(program: Command): void {
 
         if (data.content !== undefined) {
           // Simple asset
-          const outputPath = options.output ?? (data.filename || `${name}.md`)
+          const outputPath = options.output ?? (data.filepath || `${name}.md`)
           const resolvedOutput = path.resolve(outputPath)
           fs.mkdirSync(path.dirname(resolvedOutput), { recursive: true })
           fs.writeFileSync(resolvedOutput, data.content, 'utf-8')
           spinner.succeed(`Pulled ${ownerName}@${data.version} → ${outputPath}`)
         } else if (data.download_url) {
           // Skill/bundle package
-          const outputDir = options.output ?? (data.filename || name)
+          const outputDir = options.output ?? (data.filepath || name)
           const resolvedDir = path.resolve(outputDir)
           spinner.text = 'Downloading package...'
           const buffer = await downloadToBuffer(data.download_url)
